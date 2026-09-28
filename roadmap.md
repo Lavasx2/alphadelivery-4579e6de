@@ -1,19 +1,17 @@
 # Roadmap
 
 ## Done
-- [x] Link managed Google Maps Platform connection to the remixed project (verified: home page map renders with browser key, no console errors)
+- [x] Link managed Google Maps Platform connection (verified: home map renders, no console errors)
+- [x] Clarify multi-vendor platform requirements with user
 
-## Open
-- [ ] Multi-vendor platform transformation (user-uploads spec) — BLOCKED ON ANSWERS:
-  1. Transform this project (Crust Tebessa becomes the first store) vs start a fresh project?
-  2. Store onboarding: auto-activate after wizard, or require owner approval first?
-  3. Platform commission on orders (none / % / flat fee)?
-  4. Build scope: everything at once, or phased (DB + store pages → driver network → onboarding wizard)?
-
-### Planned work once decided
-- [ ] DB restructure: stores (profile, colors, slug, hours), products/categories per store, orders → store_id, drivers unified (not per-store), store onboarding state
-- [ ] Store onboarding wizard (data, colors w/ live preview, logo/banner/product image upload, menu builder)
-- [ ] Auto-generated store page at /store/:slug using same design as original store page with dynamic theme
-- [ ] Home page: list/search/filter active stores
-- [ ] Unified driver network: drivers see all orders from all stores; new-order notifications for nearby drivers
-- [ ] Order flow: store owner sees own orders; couriers see pickup (store location) + delivery (customer) details
+## Open — Alpha Delivery multi-vendor build (build everything)
+- [ ] DB migration: stores (+owner, slug, colors, hours, location, approval status), store_categories, store_products, store_subscriptions (annual), courier_subscriptions (monthly), orders.store_id
+- [ ] Seed Crust Tebessa as first approved store with its menu
+- [ ] Alpha Delivery branding on home/shell (awaiting user logo)
+- [ ] Home page: directory of approved stores, search + filter
+- [ ] /store/$slug: dynamic-theme store page (same design as current home), menu + cart + order flow per store
+- [ ] Onboarding wizard: store data, colors with live preview, image uploads, menu builder; submits for approval
+- [ ] Site-owner panel: approve/reject store applications, subscriptions
+- [ ] Store-owner dashboard: own store orders, menu management
+- [ ] Courier board: all-store order feed, accept/deliver, monthly subscription status
+- [ ] Order flow: store gets order for prep; couriers notified with pickup (store) + delivery (customer) info; cash payment
