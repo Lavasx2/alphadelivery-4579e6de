@@ -98,6 +98,7 @@ export type Database = {
           popular: boolean
           price: number
           sort_order: number
+          store_id: string | null
         }
         Insert: {
           available?: boolean
@@ -110,6 +111,7 @@ export type Database = {
           popular?: boolean
           price?: number
           sort_order?: number
+          store_id?: string | null
         }
         Update: {
           available?: boolean
@@ -122,8 +124,17 @@ export type Database = {
           popular?: boolean
           price?: number
           sort_order?: number
+          store_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
@@ -143,6 +154,7 @@ export type Database = {
           notes: string | null
           phone: string
           status: string
+          store_id: string | null
           total: number
         }
         Insert: {
@@ -162,6 +174,7 @@ export type Database = {
           notes?: string | null
           phone: string
           status?: string
+          store_id?: string | null
           total: number
         }
         Update: {
@@ -181,9 +194,18 @@ export type Database = {
           notes?: string | null
           phone?: string
           status?: string
+          store_id?: string | null
           total?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       owner_emails: {
         Row: {
@@ -230,6 +252,120 @@ export type Database = {
         }
         Relationships: []
       }
+      stores: {
+        Row: {
+          address: string | null
+          banner_url: string | null
+          category: string | null
+          created_at: string
+          delivery_fee_max: number
+          delivery_fee_min: number
+          delivery_max_km: number
+          description: string | null
+          featured: boolean
+          fee_amount: number | null
+          id: string
+          lat: number | null
+          lng: number | null
+          logo_url: string | null
+          maps_url: string | null
+          name: string
+          opening_hours: Json | null
+          owner_user_id: string | null
+          paid_at: string | null
+          payment_holder: string | null
+          payment_last4: string | null
+          payment_reference: string | null
+          payment_status: string
+          phone: string | null
+          place_id: string | null
+          plus_code: string | null
+          primary_color: string | null
+          rating: number | null
+          rating_count: number | null
+          secondary_color: string | null
+          slug: string
+          status: string
+          subscription_paid_until: string | null
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          banner_url?: string | null
+          category?: string | null
+          created_at?: string
+          delivery_fee_max?: number
+          delivery_fee_min?: number
+          delivery_max_km?: number
+          description?: string | null
+          featured?: boolean
+          fee_amount?: number | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          logo_url?: string | null
+          maps_url?: string | null
+          name: string
+          opening_hours?: Json | null
+          owner_user_id?: string | null
+          paid_at?: string | null
+          payment_holder?: string | null
+          payment_last4?: string | null
+          payment_reference?: string | null
+          payment_status?: string
+          phone?: string | null
+          place_id?: string | null
+          plus_code?: string | null
+          primary_color?: string | null
+          rating?: number | null
+          rating_count?: number | null
+          secondary_color?: string | null
+          slug: string
+          status?: string
+          subscription_paid_until?: string | null
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          banner_url?: string | null
+          category?: string | null
+          created_at?: string
+          delivery_fee_max?: number
+          delivery_fee_min?: number
+          delivery_max_km?: number
+          description?: string | null
+          featured?: boolean
+          fee_amount?: number | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          logo_url?: string | null
+          maps_url?: string | null
+          name?: string
+          opening_hours?: Json | null
+          owner_user_id?: string | null
+          paid_at?: string | null
+          payment_holder?: string | null
+          payment_last4?: string | null
+          payment_reference?: string | null
+          payment_status?: string
+          phone?: string | null
+          place_id?: string | null
+          plus_code?: string | null
+          primary_color?: string | null
+          rating?: number | null
+          rating_count?: number | null
+          secondary_color?: string | null
+          slug?: string
+          status?: string
+          subscription_paid_until?: string | null
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -256,6 +392,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_store_owner_role: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -263,9 +400,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_store_owner: { Args: { _store_id: string }; Returns: boolean }
+      store_is_live: { Args: { _store_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "owner" | "courier" | "customer"
+      app_role: "owner" | "courier" | "customer" | "store_owner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -393,7 +532,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "courier", "customer"],
+      app_role: ["owner", "courier", "customer", "store_owner"],
     },
   },
 } as const
