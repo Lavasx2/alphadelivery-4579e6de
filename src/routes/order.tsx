@@ -12,16 +12,16 @@ const MapPicker = lazy(() => import("@/components/MapPicker"));
 export const Route = createFileRoute("/order")({
   head: () => ({
     meta: [
-      { title: "اطلب للمنزل | كراست تبسة" },
+      { title: "سلة الطلب | ألفا ديليفري" },
       {
         name: "description",
         content:
-          "اطلب من كراست تبسة ونوصل لك للمنزل — أكمل سلة الطلبات وأدخل اسمك ورقم هاتفك وعنوانك.",
+          "اطلب من متاجر ألفا ديليفري ونوصل لك للمنزل — أكمل سلة الطلبات وأدخل اسمك ورقم هاتفك وعنوانك.",
       },
-      { property: "og:title", content: "اطلب للمنزل | كراست تبسة" },
+      { property: "og:title", content: "سلة الطلب | ألفا ديليفري" },
       {
         property: "og:description",
-        content: "أكمل طلبك من كراست تبسة ونوصله ساخناً إلى باب دارك.",
+        content: "أكمل طلبك عبر ألفا ديليفري ونوصله ساخناً إلى باب دارك.",
       },
     ],
   }),
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/order")({
 });
 
 function OrderPage() {
-  const { lines, total, setQty, remove, clear } = useCart();
+  const { lines, total, setQty, remove, clear, store } = useCart();
   const { t } = useI18n();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -55,7 +55,7 @@ function OrderPage() {
     setError(null);
     setLocating(true);
     try {
-      const res = await quoteDelivery({ data: { lat, lng } });
+      const res = await quoteDelivery({ data: { lat, lng, storeId: store?.id } });
       setQuote({ ...res, lat, lng });
       if (res.outOfRange) setError(t("outOfRange"));
     } catch {
@@ -116,6 +116,7 @@ function OrderPage() {
       lat: quote.lat,
       lng: quote.lng,
       maps_url: quote.mapsUrl,
+      store_id: store?.id ?? null,
     });
     setLoading(false);
     if (dbError) {
@@ -136,7 +137,7 @@ function OrderPage() {
           <bdi dir="ltr">{phone}</bdi>
         </p>
         <Link
-          to="/menu"
+          to="/"
           className="mt-8 rounded-lg bg-primary px-6 py-3 font-bold text-primary-foreground hover:bg-primary/90"
         >
           {t("backToMenu")}
@@ -151,6 +152,11 @@ function OrderPage() {
         <Bike className="size-7 shrink-0 text-primary sm:size-9" />
         {t("orderTitle")}
       </h1>
+      {store && (
+        <p className="mt-1 text-sm font-bold text-primary">
+          {store.name}
+        </p>
+      )}
       <p className="mt-2 text-sm text-muted-foreground sm:text-base">
         {t("orderIntro")}
       </p>
@@ -159,7 +165,7 @@ function OrderPage() {
         <div className="mt-16 text-center">
           <p className="text-lg text-muted-foreground">{t("emptyCart")}</p>
           <Link
-            to="/menu"
+            to="/"
             className="mt-6 inline-block rounded-lg bg-primary px-6 py-3 font-bold text-primary-foreground hover:bg-primary/90"
           >
             {t("browseMenu")}
@@ -298,7 +304,7 @@ function OrderPage() {
                 <ClientOnly fallback={<div className="h-64 rounded-lg bg-secondary" />}>
                   <Suspense fallback={<div className="h-64 rounded-lg bg-secondary" />}>
                     <MapPicker
-                      center={{ lat: RESTAURANT.lat, lng: RESTAURANT.lng }}
+                      center={{ lat: store?.lat ?? RESTAURANT.lat, lng: store?.lng ?? RESTAURANT.lng }}
                       value={quote ? { lat: quote.lat, lng: quote.lng } : null}
                       onPick={(p) => void quoteFor(p.lat, p.lng)}
                     />
