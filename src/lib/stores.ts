@@ -17,7 +17,7 @@ export type PublicStore = {
   maps_url: string | null;
   primary_color: string | null;
   secondary_color: string | null;
-  opening_hours: unknown;
+  opening_hours: Record<string, string> | null;
   rating: number | null;
   rating_count: number | null;
   featured: boolean;

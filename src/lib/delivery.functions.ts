@@ -29,7 +29,7 @@ function haversineKm(lat: number, lng: number, ORIGIN: { latitude: number; longi
 }
 
 export const quoteDelivery = createServerFn({ method: "POST" })
-  .inputValidator((input: { lat: number; lng: number; storeId?: string }) => {
+  .inputValidator((input: { lat: number; lng: number; storeId?: string | undefined }) => {
     const lat = Number(input?.lat);
     const lng = Number(input?.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
