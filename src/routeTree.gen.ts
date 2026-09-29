@@ -15,6 +15,7 @@ import { Route as CourierRouteImport } from './routes/courier'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as OrderRouteImport } from './routes/order'
+import { Route as StoreSlugRouteImport } from './routes/store.$slug'
 import { Route as ApiPublicMenuImageRouteImport } from './routes/api/public/menu-image'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const OrderRoute = OrderRouteImport.update({
   path: '/order',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StoreSlugRoute = StoreSlugRouteImport.update({
+  id: '/store/$slug',
+  path: '/store/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMenuImageRoute = ApiPublicMenuImageRouteImport.update({
   id: '/api/public/menu-image',
   path: '/api/public/menu-image',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/menu': typeof MenuRoute
   '/order': typeof OrderRoute
+  '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/menu': typeof MenuRoute
   '/order': typeof OrderRoute
+  '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/menu': typeof MenuRoute
   '/order': typeof OrderRoute
+  '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/menu'
     | '/order'
+    | '/store/$slug'
     | '/api/public/menu-image'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/menu'
     | '/order'
+    | '/store/$slug'
     | '/api/public/menu-image'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/menu'
     | '/order'
+    | '/store/$slug'
     | '/api/public/menu-image'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   MenuRoute: typeof MenuRoute
   OrderRoute: typeof OrderRoute
+  StoreSlugRoute: typeof StoreSlugRoute
   ApiPublicMenuImageRoute: typeof ApiPublicMenuImageRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/store/$slug': {
+      id: '/store/$slug'
+      path: '/store/$slug'
+      fullPath: '/store/$slug'
+      preLoaderRoute: typeof StoreSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/menu-image': {
       id: '/api/public/menu-image'
       path: '/api/public/menu-image'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   MenuRoute: MenuRoute,
   OrderRoute: OrderRoute,
+  StoreSlugRoute: StoreSlugRoute,
   ApiPublicMenuImageRoute: ApiPublicMenuImageRoute,
 }
 export const routeTree = rootRouteImport
