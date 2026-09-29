@@ -10,13 +10,13 @@ export const MAX_DELIVERY_KM = 16;
 export const MIN_FEE = 150;
 export const MAX_FEE = 350;
 
-export function feeForDistance(km: number) {
-  const ratio = Math.min(1, Math.max(0, km / MAX_DELIVERY_KM));
-  const raw = MIN_FEE + (MAX_FEE - MIN_FEE) * ratio;
+export function feeForDistance(km: number, maxKm = MAX_DELIVERY_KM, minFee = MIN_FEE, maxFee = MAX_FEE) {
+  const ratio = Math.min(1, Math.max(0, km / maxKm));
+  const raw = minFee + (maxFee - minFee) * ratio;
   return Math.round(raw / 10) * 10;
 }
 
-function haversineKm(lat: number, lng: number) {
+function haversineKm(lat: number, lng: number, ORIGIN: { latitude: number; longitude: number }) {
   const R = 6371;
   const dLat = ((lat - ORIGIN.latitude) * Math.PI) / 180;
   const dLng = ((lng - ORIGIN.longitude) * Math.PI) / 180;
@@ -29,7 +29,7 @@ function haversineKm(lat: number, lng: number) {
 }
 
 export const quoteDelivery = createServerFn({ method: "POST" })
-  .inputValidator((input: { lat: number; lng: number }) => {
+  .inputValidator((input: { lat: number; lng: number; storeId?: string }) => {
     const lat = Number(input?.lat);
     const lng = Number(input?.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
@@ -38,13 +38,26 @@ export const quoteDelivery = createServerFn({ method: "POST" })
     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
       throw new Error("INVALID_LOCATION");
     }
-    return { lat, lng };
+    const storeId = typeof input?.storeId === "string" ? input.storeId : undefined;
+    return { lat, lng, storeId };
   })
   .handler(async ({ data }) => {
     const lovableKey = process.env["LOVABLE_API_KEY"];
     const mapsKey = process.env["GOOGLE_MAPS_API_KEY"];
 
-    let km = haversineKm(data.lat, data.lng) * 1.3; // fallback: road factor
+    let origin = ORIGIN;
+    let maxKm = MAX_DELIVERY_KM, minFee = MIN_FEE, maxFee = MAX_FEE;
+    if (data.storeId) {
+      const { getStoreDeliveryConfig } = await import("@/lib/stores-public.functions");
+      const cfg = await getStoreDeliveryConfig(data.storeId);
+      if (cfg?.lat != null && cfg?.lng != null) origin = { latitude: cfg.lat, longitude: cfg.lng };
+      if (cfg) {
+        maxKm = Number(cfg.delivery_max_km) || maxKm;
+        minFee = Number(cfg.delivery_fee_min) || minFee;
+        maxFee = Number(cfg.delivery_fee_max) || maxFee;
+      }
+    }
+    let km = haversineKm(data.lat, data.lng, origin) * 1.3; // fallback: road factor
     let source: "routes" | "estimate" = "estimate";
 
     if (lovableKey && mapsKey) {
@@ -58,7 +71,7 @@ export const quoteDelivery = createServerFn({ method: "POST" })
             "X-Goog-FieldMask": "routes.distanceMeters,routes.duration",
           },
           body: JSON.stringify({
-            origin: { location: { latLng: ORIGIN } },
+            origin: { location: { latLng: origin } },
             destination: {
               location: { latLng: { latitude: data.lat, longitude: data.lng } },
             },
@@ -113,8 +126,8 @@ export const quoteDelivery = createServerFn({ method: "POST" })
     const distanceKm = Math.round(km * 10) / 10;
     return {
       distanceKm,
-      fee: feeForDistance(distanceKm),
-      outOfRange: distanceKm > MAX_DELIVERY_KM,
+      fee: feeForDistance(distanceKm, maxKm, minFee, maxFee),
+      outOfRange: distanceKm > maxKm,
       mapsUrl: `https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}`,
       address,
       source,
