@@ -7,7 +7,7 @@ type UploadInput = {
   dataBase64: string;
 };
 
-/** Owner-only menu image upload. Returns a public proxy URL. */
+/** Signed-in image upload (menus, logos, banners). Returns a public proxy URL. */
 export const uploadMenuImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: UploadInput) => {
@@ -15,11 +15,10 @@ export const uploadMenuImage = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    const { data: isOwner } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "owner",
-    });
-    if (!isOwner) throw new Error("Forbidden");
+    // Any signed-in user may upload (store owners during onboarding); size-capped.
+    if (!context.userId) throw new Error("Forbidden");
+    if (data.dataBase64.length > 4_000_000) throw new Error("File too large (max 3MB)");
+    if (!/^image\//.test(data.contentType || "image/jpeg")) throw new Error("Images only");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const bytes = Uint8Array.from(atob(data.dataBase64), (c) => c.charCodeAt(0));
@@ -45,11 +44,10 @@ export const addOwnerByEmail = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    const { data: isOwner } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "owner",
-    });
-    if (!isOwner) throw new Error("Forbidden");
+    // Any signed-in user may upload (store owners during onboarding); size-capped.
+    if (!context.userId) throw new Error("Forbidden");
+    if (data.dataBase64.length > 4_000_000) throw new Error("File too large (max 3MB)");
+    if (!/^image\//.test(data.contentType || "image/jpeg")) throw new Error("Images only");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: profile, error } = await supabaseAdmin

@@ -26,6 +26,8 @@ type Order = {
   maps_url: string | null;
   distance_km: number | null;
   delivery_fee: number | null;
+  store_id: string | null;
+  stores: { name: string; address: string | null; phone: string | null; maps_url: string | null } | null;
 };
 
 const HIDE_DELIVERED_AFTER_MS = 4 * 60 * 1000;
@@ -60,7 +62,7 @@ function beep() {
   }
 }
 
-export function OrdersBoard({ mode }: { mode: "owner" | "courier" }) {
+export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "store"; storeId?: string }) {
   const { t } = useI18n();
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -79,11 +81,13 @@ export function OrdersBoard({ mode }: { mode: "owner" | "courier" }) {
   }, []);
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase
+    let q = supabase
       .from("orders")
-      .select("*")
+      .select("*, stores(name,address,phone,maps_url)")
       .order("created_at", { ascending: false })
       .limit(100);
+    if (storeId) q = q.eq("store_id", storeId);
+    const { data, error } = await q;
     if (error) setErr(error.message);
     const rows = (data ?? []) as Order[];
     const newIds = rows.filter((o) => o.status === "new").map((o) => o.id);
@@ -96,7 +100,7 @@ export function OrdersBoard({ mode }: { mode: "owner" | "courier" }) {
     }
     setOrders(rows);
     setLoading(false);
-  }, []);
+  }, [storeId]);
 
   useEffect(() => {
     void load();
@@ -164,6 +168,13 @@ export function OrdersBoard({ mode }: { mode: "owner" | "courier" }) {
           <div key={o.id} className="rounded-2xl border border-border bg-card p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
+                {o.stores && (
+                  <p className="mb-1 text-sm font-black text-primary">
+                    🏪 {o.stores.name}
+                    {o.stores.address ? ` — ${o.stores.address}` : ""}
+                    {o.stores.phone ? ` — ${o.stores.phone}` : ""}
+                  </p>
+                )}
                 <p className="font-bold">
                   {t("customer")}: {o.customer_name} — {o.phone}
                 </p>
