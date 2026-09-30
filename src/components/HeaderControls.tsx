@@ -52,7 +52,7 @@ export function LanguageSwitcher() {
 
 export function AccountMenu() {
   const { t } = useI18n();
-  const { user, isOwner, isCourier, loading } = useAuth();
+  const { user, isOwner, isCourier, isStoreOwner, loading } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
