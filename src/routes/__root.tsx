@@ -8,12 +8,12 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { MapPin, Phone, ShoppingBag, Star, UtensilsCrossed } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
+import alphaLogo from "../assets/alpha-logo.jpg.asset.json";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider, useCart } from "../lib/cart";
-import { RESTAURANT } from "../lib/menu";
 import { AuthProvider } from "../lib/auth";
 import { I18nProvider, useI18n } from "../lib/i18n";
 import { AccountMenu, LanguageSwitcher } from "../components/HeaderControls";
@@ -91,24 +91,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "width=device-width, initial-scale=1, viewport-fit=cover",
         },
         { name: "theme-color", content: "#1a1a1a" },
-        { title: "كراست تبسة | Crust Tebessa — بيتزا وطاكوس وبرغر وتوصيل للمنازل" },
+        { title: "ألفا ديليفري | Alpha Delivery" },
         {
           name: "description",
           content:
-            "مطعم كراست تبسة — بيتزا، طاكوس، برغر، مقلوب وصوفلي. اطلب من المنزل ونوصل لك في تبسة. تقييم 4.9 على قوقل مابس.",
+            "ألفا ديليفري — اطلب من كل متاجر مدينتك والدفع عند الاستلام.",
         },
-        { property: "og:title", content: "كراست تبسة | Crust Tebessa" },
+        { property: "og:title", content: "ألفا ديليفري | Alpha Delivery" },
         {
           property: "og:description",
           content:
-            "بيتزا، طاكوس وبرغر في قلب تبسة. اطلب أونلاين ونوصل لك للمنزل.",
+            "كل المتاجر في تطبيق واحد.",
         },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "mobile-web-app-capable", content: "yes" },
         { name: "apple-mobile-web-app-capable", content: "yes" },
         { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-        { name: "apple-mobile-web-app-title", content: "كراست" },
+        { name: "apple-mobile-web-app-title", content: "ألفا" },
       ],
       links: [
         { rel: "stylesheet", href: appCss },
@@ -161,11 +161,9 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-2.5 sm:flex sm:justify-between sm:px-4 sm:py-3">
         <Link to="/" className="flex min-w-0 items-center gap-2">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <UtensilsCrossed className="size-5" />
-          </span>
+          <img src={alphaLogo.url} alt="Alpha Delivery" className="size-9 shrink-0 rounded-lg object-cover" />
           <span className="truncate text-base font-extrabold sm:text-lg">
-            كراست <span className="text-primary">تبسة</span>
+            ألفا <span className="text-primary">ديليفري</span>
           </span>
         </Link>
         <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
@@ -177,11 +175,11 @@ function Header() {
             {t("home")}
           </Link>
           <Link
-            to="/menu"
-            className={linkCls}
+            to="/open-store"
+            className={`hidden md:inline-flex ${linkCls}`}
             activeProps={{ className: activeCls }}
           >
-            {t("menu")}
+            افتح متجرك
           </Link>
           <LanguageSwitcher />
           <AccountMenu />
@@ -208,70 +206,21 @@ function Footer() {
   const { t } = useI18n();
   return (
     <footer className="border-t border-border bg-card">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <UtensilsCrossed className="size-5" />
-            </span>
-            <span className="text-lg font-extrabold">
-              Crust <span className="text-primary">Tebessa</span>
-            </span>
-          </div>
-          <p className="mt-3 text-sm text-muted-foreground">{t("footerAbout")}</p>
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-8 text-center sm:flex-row sm:justify-between sm:text-start">
+        <div className="flex items-center gap-2">
+          <img src={alphaLogo.url} alt="" className="size-9 rounded-lg object-cover" />
+          <span className="text-lg font-extrabold">
+            Alpha <span className="text-primary">Delivery</span>
+          </span>
         </div>
-        <div>
-          <h3 className="font-bold">{t("info")}</h3>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-center gap-2">
-              <MapPin className="size-4 text-primary" />
-              {RESTAURANT.plusCode}, {RESTAURANT.address}
-            </li>
-            <li>
-              <a
-                href={`tel:${RESTAURANT.phone}`}
-                className="flex items-center gap-2 hover:text-primary"
-              >
-                <Phone className="size-4 text-primary" />
-                {RESTAURANT.phone}
-              </a>
-            </li>
-            <li className="flex items-center gap-2">
-              <Star className="size-4 text-primary" />
-              {RESTAURANT.rating} {t("onGoogleMaps")} ({RESTAURANT.ratingCount}{" "}
-              {t("reviews")})
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="font-bold">{t("links")}</h3>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link to="/menu" className="text-muted-foreground hover:text-primary">
-                {t("fullMenu")}
-              </Link>
-            </li>
-            <li>
-              <Link to="/order" className="text-muted-foreground hover:text-primary">
-                {t("orderHome")}
-              </Link>
-            </li>
-            <li>
-              <a
-                href={RESTAURANT.mapsUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-muted-foreground hover:text-primary"
-              >
-                {t("ourGooglePage")}
-              </a>
-            </li>
-          </ul>
-        </div>
+        <nav className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+          <Link to="/" className="hover:text-primary">{t("home")}</Link>
+          <Link to="/open-store" className="hover:text-primary">افتح متجرك</Link>
+          <Link to="/courier" className="hover:text-primary">{t("courierArea")}</Link>
+        </nav>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Crust Tebessa — {t("rights")}
+        © {new Date().getFullYear()} Alpha Delivery — {t("rights")}
       </div>
     </footer>
   );

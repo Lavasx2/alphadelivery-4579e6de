@@ -52,7 +52,7 @@ export function LanguageSwitcher() {
 
 export function AccountMenu() {
   const { t } = useI18n();
-  const { user, isOwner, isCourier, loading } = useAuth();
+  const { user, isOwner, isCourier, isStoreOwner, loading } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -110,6 +110,18 @@ export function AccountMenu() {
                 </button>
               </li>
             )}
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  navigate({ to: isStoreOwner ? "/my-store" : "/open-store" });
+                }}
+                className="block w-full px-4 py-2 text-start text-sm hover:bg-accent/50"
+              >
+                {isStoreOwner ? "متجري" : "افتح متجرك"}
+              </button>
+            </li>
             <li>
               <button
                 type="button"

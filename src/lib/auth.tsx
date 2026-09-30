@@ -3,7 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { claimOwnerRole } from "@/lib/owner.functions";
 
-export type Role = "owner" | "courier" | "customer";
+export type Role = "owner" | "courier" | "customer" | "store_owner";
 
 type AuthCtx = {
   session: Session | null;
@@ -11,6 +11,7 @@ type AuthCtx = {
   roles: Role[];
   isOwner: boolean;
   isCourier: boolean;
+  isStoreOwner: boolean;
   loading: boolean;
   refreshRoles: () => Promise<void>;
 };
@@ -36,6 +37,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     let current = await fetchRoles(userId);
+    if (!current.includes("store_owner")) {
+      await supabase.rpc("claim_store_owner_role");
+      current = await fetchRoles(userId);
+    }
     if (!current.includes("owner")) {
       // Grants the owner role automatically to allowlisted owner emails.
       try {
@@ -68,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     roles,
     isOwner: roles.includes("owner"),
     isCourier: roles.includes("courier"),
+    isStoreOwner: roles.includes("store_owner"),
     loading,
     refreshRoles: () => loadRoles(session?.user?.id),
   };
