@@ -115,6 +115,18 @@ export function AccountMenu() {
                 type="button"
                 onClick={() => {
                   setOpen(false);
+                  navigate({ to: isStoreOwner ? "/my-store" : "/open-store" });
+                }}
+                className="block w-full px-4 py-2 text-start text-sm hover:bg-accent/50"
+              >
+                {isStoreOwner ? "متجري" : "افتح متجرك"}
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
                   navigate({ to: "/courier" });
                 }}
                 className="block w-full px-4 py-2 text-start text-sm hover:bg-accent/50"

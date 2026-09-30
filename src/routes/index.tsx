@@ -1,183 +1,168 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flame, MapPin, Phone, ShoppingBag, Star, Bike, Clock } from "lucide-react";
-import { useMemo } from "react";
-import banner from "@/assets/crust-banner.jpg.asset.json";
-import { MENU_ITEMS, RESTAURANT, formatPrice } from "@/lib/menu";
-import { localizeItem } from "@/lib/menu-i18n";
-import { useCart } from "@/lib/cart";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { Search, Star, Store as StoreIcon, Bike, Banknote, MapPin } from "lucide-react";
+import { useMemo, useState } from "react";
+import logo from "@/assets/alpha-logo.jpg.asset.json";
+import { listStores } from "@/lib/stores-public.functions";
+import { STORE_CATEGORIES } from "@/lib/stores";
 import { InstallApp } from "@/components/InstallApp";
-import { useI18n } from "@/lib/i18n";
+
+const storesQuery = queryOptions({ queryKey: ["stores", "public"], queryFn: () => listStores() });
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "كراست تبسة | Crust Tebessa — بيتزا وطاكوس وبرغر وتوصيل للمنازل" },
+      { title: "ألفا ديليفري | Alpha Delivery — كل المتاجر في تطبيق واحد" },
       {
         name: "description",
-        content:
-          "مطعم كراست تبسة — بيتزا، طاكوس، برغر، مقلوب وصوفلي بأسعار المنيو الرسمية. اطلب من المنزل ونوصل لك في تبسة.",
+        content: "ألفا ديليفري: اطلب من مطاعم ومتاجر مدينتك، ادفع نقداً عند الاستلام، وموصلونا يوصلون لباب بيتك.",
       },
-      { property: "og:title", content: "كراست تبسة | Crust Tebessa" },
-      {
-        property: "og:description",
-        content: "بيتزا، طاكوس وبرغر في قلب تبسة. اطلب أونلاين ونوصل لك للمنزل.",
-      },
+      { property: "og:title", content: "ألفا ديليفري | Alpha Delivery" },
+      { property: "og:description", content: "كل المتاجر في تطبيق واحد — الدفع عند الاستلام." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(storesQuery),
+  errorComponent: () => <p className="p-10 text-center">تعذر تحميل المتاجر. حاول مجدداً.</p>,
+  notFoundComponent: () => <p className="p-10 text-center">غير موجود</p>,
   component: HomePage,
 });
 
-const featured = MENU_ITEMS.filter((i) => i.popular);
-
 function HomePage() {
-  const { add } = useCart();
-  const { t, lang } = useI18n();
-  const mapsKey = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY"];
+  const { data: stores } = useSuspenseQuery(storesQuery);
+  const [q, setQ] = useState("");
+  const [cat, setCat] = useState<string | null>(null);
 
-  const featuredItems = useMemo(
-    () => featured.map((i) => localizeItem(i, lang)),
-    [lang]
-  );
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return stores.filter(
+      (st) =>
+        (!cat || st.category === cat) &&
+        (!s ||
+          st.name.toLowerCase().includes(s) ||
+          (st.tagline ?? "").toLowerCase().includes(s) ||
+          (st.category ?? "").includes(s)),
+    );
+  }, [stores, q, cat]);
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={banner.url}
-            alt="أطباق كراست تبسة: بيتزا، برغر، طاكوس وبانيني"
-            className="size-full object-cover object-center"
-            width={1200}
-            height={800}
-            fetchPriority="high"
-            decoding="async"
-          />
-          <div className="absolute inset-0 bg-gradient-to-l from-background via-background/85 to-background/40" />
-          <div className="absolute inset-0 bg-background/45 md:bg-transparent" />
-        </div>
-        <div className="relative mx-auto flex max-w-6xl flex-col gap-5 px-4 py-14 sm:py-20 md:gap-6 md:py-36">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-3 py-1 font-semibold text-primary">
-              <Star className="size-4 fill-primary" />
-              {RESTAURANT.rating} · {RESTAURANT.ratingCount} {t("ratingOn")}
-            </span>
-          </div>
-          <h1 className="max-w-2xl text-[2rem] font-black leading-tight sm:text-4xl md:text-6xl">
-            {t("heroTitle")}
-            <br />
-            <span className="text-primary">{t("heroTitle2")}</span>
+      <section className="border-b border-border bg-card">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-4 py-12 text-center md:py-16">
+          <img src={logo.url} alt="Alpha Delivery" className="size-24 rounded-3xl object-cover shadow-lg" />
+          <h1 className="text-3xl font-black sm:text-5xl">
+            ألفا <span className="text-primary">ديليفري</span>
           </h1>
-          <p className="max-w-xl text-base text-muted-foreground sm:text-lg">
-            {t("heroDesc")}
+          <p className="max-w-xl text-muted-foreground">
+            كل مطاعم ومتاجر مدينتك في مكان واحد. اطلب الآن وادفع نقداً عند الاستلام.
           </p>
-          <div className="grid gap-3 sm:flex sm:flex-wrap">
-            <Link
-              to="/menu"
-              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-primary px-7 text-lg font-black text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/40 transition-transform active:scale-[0.98] hover:scale-[1.03] sm:text-xl"
-            >
-              <ShoppingBag className="size-6" />
-              {t("orderNow")}
-            </Link>
-            <a
-              href={`tel:${RESTAURANT.phone}`}
-              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-accent px-6 text-base font-bold text-accent-foreground transition-transform active:scale-[0.98] hover:scale-[1.03]"
-            >
-              <Phone className="size-5" />
-              <bdi dir="ltr">{RESTAURANT.phone}</bdi>
-            </a>
-            <a
-              href={RESTAURANT.mapsUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 border-border bg-card px-6 text-base font-bold transition-colors active:scale-[0.98] hover:bg-secondary"
-            >
-              <MapPin className="size-5 text-primary" />
-              {t("ourLocation")}
-            </a>
+          <div className="relative w-full max-w-lg">
+            <Search className="absolute start-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="ابحث عن متجر أو مطعم..."
+              className="w-full rounded-xl border border-input bg-background py-3 pe-4 ps-10 text-sm outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            {[null, ...STORE_CATEGORIES].map((c) => (
+              <button
+                key={c ?? "all"}
+                onClick={() => setCat(c)}
+                className={`rounded-full px-4 py-1.5 text-sm font-bold transition-colors ${
+                  cat === c ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"
+                }`}
+              >
+                {c ?? "الكل"}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="mx-auto grid max-w-6xl gap-4 px-4 py-12 md:grid-cols-3">
-        {[
-          { icon: Flame, title: t("feature1Title"), desc: t("feature1Desc") },
-          { icon: Bike, title: t("feature2Title"), desc: t("feature2Desc") },
-          { icon: Clock, title: t("feature3Title"), desc: t("feature3Desc") },
-        ].map(({ icon: Icon, title, desc }) => (
-          <div key={title} className="rounded-2xl border border-border bg-card p-6">
-            <span className="flex size-11 items-center justify-center rounded-xl bg-primary/15 text-primary">
-              <Icon className="size-6" />
-            </span>
-            <h3 className="mt-4 text-lg font-bold">{title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
+      <section className="mx-auto max-w-6xl px-4 py-10">
+        <h2 className="text-2xl font-black">المتاجر المتاحة</h2>
+        {filtered.length === 0 ? (
+          <p className="mt-6 text-muted-foreground">لا توجد متاجر مطابقة.</p>
+        ) : (
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((st) => (
+              <Link
+                key={st.id}
+                to="/store/$slug"
+                params={{ slug: st.slug }}
+                className="group overflow-hidden rounded-2xl border border-border bg-card transition-transform hover:-translate-y-1"
+              >
+                <div className="relative h-36 bg-secondary" style={{ background: st.primary_color ?? undefined }}>
+                  {st.banner_url && (
+                    <img src={st.banner_url} alt="" className="size-full object-cover" loading="lazy" />
+                  )}
+                  {st.featured && (
+                    <span className="absolute start-3 top-3 rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">
+                      مميز
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-start gap-3 p-4">
+                  <div className="-mt-10 flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border-4 border-card bg-background">
+                    {st.logo_url ? (
+                      <img src={st.logo_url} alt={st.name} className="size-full object-cover" />
+                    ) : (
+                      <StoreIcon className="size-7 text-primary" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="truncate text-lg font-extrabold group-hover:text-primary">{st.name}</h3>
+                    {st.tagline && <p className="line-clamp-1 text-sm text-muted-foreground">{st.tagline}</p>}
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                      {st.rating !== null && (
+                        <span className="inline-flex items-center gap-1">
+                          <Star className="size-3.5 fill-primary text-primary" /> {st.rating}
+                        </span>
+                      )}
+                      {st.category && <span>{st.category}</span>}
+                      {st.address && (
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="size-3.5" /> <span className="line-clamp-1">{st.address}</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-        ))}
+        )}
       </section>
 
-      {/* Featured dishes */}
-      <section className="mx-auto max-w-6xl px-4 py-12">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
-          <div className="min-w-0">
-            <h2 className="text-2xl font-black sm:text-3xl">{t("mostOrdered")}</h2>
-            <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-              {t("mostOrderedDesc")}
-            </p>
-          </div>
-          <Link
-            to="/menu"
-            className="shrink-0 text-sm font-bold text-primary hover:underline"
-          >
-            {t("fullMenu")} ←
+      <section className="border-t border-border bg-card">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:grid-cols-3">
+          <Feature icon={<Banknote className="size-6" />} title="الدفع عند الاستلام" text="تدفع ثمن الطلب والتوصيل نقداً للموصل." />
+          <Feature icon={<Bike className="size-6" />} title="شبكة موصلين موحدة" text="موصلون معتمدون يوصلون من كل المتاجر." />
+          <Link to="/open-store" className="rounded-2xl border border-primary/40 p-5 hover:bg-primary/5">
+            <div className="flex items-center gap-2 font-extrabold text-primary">
+              <StoreIcon className="size-6" /> افتح متجرك على ألفا
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">سجّل متجرك، صمّم صفحتك وأضف منيوك — ننشره بعد المراجعة.</p>
           </Link>
         </div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {featuredItems.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-2xl border border-border bg-card p-5"
-            >
-              <span className="text-xs font-bold text-accent">{item.category}</span>
-              <h3 className="mt-1 text-lg font-bold">{item.name}</h3>
-              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                {item.description}
-              </p>
-              <div className="mt-4 flex items-center justify-between">
-                <span className="font-black text-primary">
-                  {formatPrice(item.price)}
-                </span>
-                <button
-                  onClick={() => add(item)}
-                  className="min-h-11 rounded-lg bg-primary px-5 text-sm font-black text-primary-foreground transition-colors active:scale-[0.98] hover:bg-primary/90"
-                >
-                  {t("add_")}
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="mx-auto max-w-6xl px-4 pb-10">
+          <InstallApp />
         </div>
       </section>
+    </div>
+  );
+}
 
-      {/* Map */}
-      <section className="mx-auto max-w-6xl px-4 py-12">
-        <h2 className="text-2xl font-black sm:text-3xl">{t("visitUs")}</h2>
-        <p className="mt-1 flex items-center gap-2 text-muted-foreground">
-          <MapPin className="size-4 text-primary" />
-          {RESTAURANT.plusCode}، {RESTAURANT.address}
-        </p>
-        <div className="mt-6 overflow-hidden rounded-2xl border border-border">
-          <iframe
-            title={t("mapTitle")}
-            src={`https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=place_id:${RESTAURANT.placeId}&language=${lang}&zoom=16`}
-            className="h-64 w-full border-0 sm:h-96"
-            loading="lazy"
-            allowFullScreen
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
-        <InstallApp />
-      </section>
+function Feature({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div className="rounded-2xl border border-border p-5">
+      <div className="flex items-center gap-2 font-extrabold">
+        <span className="text-primary">{icon}</span> {title}
+      </div>
+      <p className="mt-2 text-sm text-muted-foreground">{text}</p>
     </div>
   );
 }
