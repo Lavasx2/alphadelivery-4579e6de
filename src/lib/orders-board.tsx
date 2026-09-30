@@ -246,7 +246,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
                 {t("total")}: {formatPrice(Number(o.total))}
               </span>
               <div className="flex gap-2">
-                {o.status === "new" && (
+                {o.status === "new" && mode !== "store" && (
                   <button
                     onClick={() => {
                       if (!user) return;
@@ -270,7 +270,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
                     {t("accept")}
                   </button>
                 )}
-                {o.status === "delivering" && (
+                {o.status === "delivering" && mode !== "store" && (
                   <button
                     onClick={() => void update(o.id, { status: "delivered" })}
                     className="rounded-lg bg-green-600 px-4 py-2 text-sm font-bold text-white"
@@ -278,7 +278,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
                     {t("markDelivered")}
                   </button>
                 )}
-                {mode === "owner" && o.status !== "cancelled" && (
+                {mode !== "courier" && o.status === "new" && (
                   <button
                     onClick={() => void update(o.id, { status: "cancelled" })}
                     className="rounded-lg border border-border px-4 py-2 text-sm font-bold text-muted-foreground"
