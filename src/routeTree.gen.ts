@@ -14,6 +14,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CourierRouteImport } from './routes/courier'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as MenuRouteImport } from './routes/menu'
+import { Route as MyStoreRouteImport } from './routes/my-store'
+import { Route as OpenStoreRouteImport } from './routes/open-store'
 import { Route as OrderRouteImport } from './routes/order'
 import { Route as StoreSlugRouteImport } from './routes/store.$slug'
 import { Route as ApiPublicMenuImageRouteImport } from './routes/api/public/menu-image'
@@ -43,6 +45,16 @@ const MenuRoute = MenuRouteImport.update({
   path: '/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyStoreRoute = MyStoreRouteImport.update({
+  id: '/my-store',
+  path: '/my-store',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpenStoreRoute = OpenStoreRouteImport.update({
+  id: '/open-store',
+  path: '/open-store',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrderRoute = OrderRouteImport.update({
   id: '/order',
   path: '/order',
@@ -65,6 +77,8 @@ export interface FileRoutesByFullPath {
   '/courier': typeof CourierRoute
   '/dashboard': typeof DashboardRoute
   '/menu': typeof MenuRoute
+  '/my-store': typeof MyStoreRoute
+  '/open-store': typeof OpenStoreRoute
   '/order': typeof OrderRoute
   '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
@@ -75,6 +89,8 @@ export interface FileRoutesByTo {
   '/courier': typeof CourierRoute
   '/dashboard': typeof DashboardRoute
   '/menu': typeof MenuRoute
+  '/my-store': typeof MyStoreRoute
+  '/open-store': typeof OpenStoreRoute
   '/order': typeof OrderRoute
   '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
@@ -86,6 +102,8 @@ export interface FileRoutesById {
   '/courier': typeof CourierRoute
   '/dashboard': typeof DashboardRoute
   '/menu': typeof MenuRoute
+  '/my-store': typeof MyStoreRoute
+  '/open-store': typeof OpenStoreRoute
   '/order': typeof OrderRoute
   '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
@@ -98,6 +116,8 @@ export interface FileRouteTypes {
     | '/courier'
     | '/dashboard'
     | '/menu'
+    | '/my-store'
+    | '/open-store'
     | '/order'
     | '/store/$slug'
     | '/api/public/menu-image'
@@ -108,6 +128,8 @@ export interface FileRouteTypes {
     | '/courier'
     | '/dashboard'
     | '/menu'
+    | '/my-store'
+    | '/open-store'
     | '/order'
     | '/store/$slug'
     | '/api/public/menu-image'
@@ -118,6 +140,8 @@ export interface FileRouteTypes {
     | '/courier'
     | '/dashboard'
     | '/menu'
+    | '/my-store'
+    | '/open-store'
     | '/order'
     | '/store/$slug'
     | '/api/public/menu-image'
@@ -129,6 +153,8 @@ export interface RootRouteChildren {
   CourierRoute: typeof CourierRoute
   DashboardRoute: typeof DashboardRoute
   MenuRoute: typeof MenuRoute
+  MyStoreRoute: typeof MyStoreRoute
+  OpenStoreRoute: typeof OpenStoreRoute
   OrderRoute: typeof OrderRoute
   StoreSlugRoute: typeof StoreSlugRoute
   ApiPublicMenuImageRoute: typeof ApiPublicMenuImageRoute
@@ -171,6 +197,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-store': {
+      id: '/my-store'
+      path: '/my-store'
+      fullPath: '/my-store'
+      preLoaderRoute: typeof MyStoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/open-store': {
+      id: '/open-store'
+      path: '/open-store'
+      fullPath: '/open-store'
+      preLoaderRoute: typeof OpenStoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/order': {
       id: '/order'
       path: '/order'
@@ -201,6 +241,8 @@ const rootRouteChildren: RootRouteChildren = {
   CourierRoute: CourierRoute,
   DashboardRoute: DashboardRoute,
   MenuRoute: MenuRoute,
+  MyStoreRoute: MyStoreRoute,
+  OpenStoreRoute: OpenStoreRoute,
   OrderRoute: OrderRoute,
   StoreSlugRoute: StoreSlugRoute,
   ApiPublicMenuImageRoute: ApiPublicMenuImageRoute,

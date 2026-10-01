@@ -44,10 +44,11 @@ export const addOwnerByEmail = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    // Any signed-in user may upload (store owners during onboarding); size-capped.
-    if (!context.userId) throw new Error("Forbidden");
-    if (data.dataBase64.length > 4_000_000) throw new Error("File too large (max 3MB)");
-    if (!/^image\//.test(data.contentType || "image/jpeg")) throw new Error("Images only");
+    const { data: isOwner } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "owner",
+    });
+    if (!isOwner) throw new Error("Forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: profile, error } = await supabaseAdmin

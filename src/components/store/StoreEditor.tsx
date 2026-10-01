@@ -73,7 +73,7 @@ export function draftToRow(d: StoreDraft) {
 
 export function rowToDraft(r: Record<string, unknown>): StoreDraft {
   const s = (k: string) => (r[k] == null ? "" : String(r[k]));
-  const hours = r.opening_hours as { text?: string } | null;
+  const hours = r["opening_hours"] as { text?: string } | null;
   return {
     ...emptyDraft,
     name: s("name"),
