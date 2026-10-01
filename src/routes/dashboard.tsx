@@ -60,7 +60,7 @@ function DashboardPage() {
   const { t } = useI18n();
   const { session, isOwner, loading } = useAuth();
   const [tab, setTab] = useState<
-    "orders" | "menu" | "couriers" | "owners" | "settings"
+    "orders" | "stores" | "menu" | "couriers" | "owners" | "settings"
   >("orders");
 
 
@@ -87,6 +87,7 @@ function DashboardPage() {
 
   const tabs = [
     { id: "orders", label: t("orders") },
+    { id: "stores", label: "المتاجر" },
     { id: "menu", label: t("manageMenu") },
     { id: "couriers", label: t("couriers") },
     { id: "owners", label: t("owners") },
@@ -115,6 +116,7 @@ function DashboardPage() {
       </div>
 
       {tab === "orders" && <OwnerOrders />}
+      {tab === "stores" && <StoresManager />}
       {tab === "menu" && <MenuManager />}
       {tab === "couriers" && <CouriersManager />}
       {tab === "owners" && <OwnersManager />}
