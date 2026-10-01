@@ -668,3 +668,105 @@ function OwnersManager() {
     </div>
   );
 }
+
+type AdminStore = {
+  id: string;
+  slug: string;
+  name: string;
+  category: string | null;
+  phone: string | null;
+  address: string | null;
+  status: string;
+  payment_status: string;
+  payment_holder: string | null;
+  payment_last4: string | null;
+  payment_reference: string | null;
+  subscription_paid_until: string | null;
+  featured: boolean;
+  created_at: string;
+};
+
+function StoresManager() {
+  const [rows, setRows] = useState<AdminStore[]>([]);
+  const [fee, setFee] = useState("");
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("stores")
+      .select("id,slug,name,category,phone,address,status,payment_status,payment_holder,payment_last4,payment_reference,subscription_paid_until,featured,created_at")
+      .order("created_at", { ascending: false });
+    if (error) setMsg(error.message);
+    setRows((data ?? []) as AdminStore[]);
+    const { data: s } = await supabase.from("app_settings").select("value").eq("key", "store_fee").maybeSingle();
+    setFee(s?.value ?? "");
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  async function update(id: string, patch: Partial<AdminStore>) {
+    const { error } = await supabase.from("stores").update(patch).eq("id", id);
+    setMsg(error ? error.message : "تم الحفظ");
+    await load();
+  }
+
+  async function confirmPayment(s: AdminStore) {
+    const base = s.subscription_paid_until && new Date(s.subscription_paid_until) > new Date() ? new Date(s.subscription_paid_until) : new Date();
+    base.setFullYear(base.getFullYear() + 1);
+    await update(s.id, { payment_status: "paid", subscription_paid_until: base.toISOString() });
+  }
+
+  async function saveFee() {
+    const { error } = await supabase.from("app_settings").upsert({ key: "store_fee", value: fee });
+    setMsg(error ? error.message : "تم حفظ رسوم الاشتراك");
+  }
+
+  const badge = (st: string) =>
+    st === "approved" ? "bg-green-500/15 text-green-600" : st === "rejected" ? "bg-red-500/15 text-red-600" : "bg-yellow-500/15 text-yellow-700";
+
+  return (
+    <div className="mt-8 space-y-4">
+      <div className="flex flex-wrap items-end gap-2 rounded-2xl border border-border bg-card p-4">
+        <label className="text-sm font-semibold">
+          الاشتراك السنوي للمتجر (دج)
+          <input className={inputCls} value={fee} onChange={(e) => setFee(e.target.value)} />
+        </label>
+        <button onClick={() => void saveFee()} className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">حفظ</button>
+      </div>
+      {msg && <p className="text-sm text-muted-foreground">{msg}</p>}
+      {rows.length === 0 && <p className="text-muted-foreground">لا توجد متاجر بعد.</p>}
+      {rows.map((s) => (
+        <div key={s.id} className="rounded-2xl border border-border bg-card p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-lg font-black">{s.name}</h3>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${badge(s.status)}`}>
+              {s.status === "approved" ? "مقبول" : s.status === "rejected" ? "مرفوض" : "قيد المراجعة"}
+            </span>
+            <span className="text-xs text-muted-foreground">{s.category}</span>
+            <Link to="/store/$slug" params={{ slug: s.slug }} className="ms-auto text-xs font-bold text-primary underline">عرض الصفحة</Link>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">{s.phone} · {s.address}</p>
+          <p className="mt-2 text-sm">
+            الدفع: <b>{s.payment_status === "paid" ? "مدفوع" : s.payment_status === "submitted" ? "بانتظار التحقق" : "غير مدفوع"}</b>
+            {s.payment_holder && ` — ${s.payment_holder} (****${s.payment_last4 ?? ""}) ${s.payment_reference ?? ""}`}
+            {s.subscription_paid_until && ` — صالح حتى ${new Date(s.subscription_paid_until).toLocaleDateString("ar-DZ")}`}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {s.status !== "approved" && (
+              <button onClick={() => void update(s.id, { status: "approved" })} className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-primary-foreground">قبول</button>
+            )}
+            {s.status !== "rejected" && (
+              <button onClick={() => void update(s.id, { status: "rejected" })} className="rounded-lg border border-red-500 px-3 py-1.5 text-xs font-bold text-red-600">رفض / إيقاف</button>
+            )}
+            <button onClick={() => void confirmPayment(s)} className="rounded-lg border border-border px-3 py-1.5 text-xs font-bold">تأكيد الدفع (+سنة)</button>
+            <button onClick={() => void update(s.id, { featured: !s.featured })} className="rounded-lg border border-border px-3 py-1.5 text-xs font-bold">
+              {s.featured ? "إلغاء التمييز" : "تمييز"}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
