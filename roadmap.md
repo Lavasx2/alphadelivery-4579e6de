@@ -15,3 +15,14 @@
 - [x] Store-owner dashboard: own store orders, menu management
 - [x] Courier board: all-store order feed, accept/deliver, monthly subscription status
 - [x] Order flow: store gets order for prep; couriers notified with pickup (store) + delivery (customer) info; cash payment
+
+## Open — Brand, localization, safety, and analytics
+- [ ] Replace yellow/black styling with the approved white, magenta, coral, and violet Alpha palette
+- [ ] Complete Arabic, English, and French translations, including editable store and menu names
+- [ ] Rename the site-owner area to “Dashboard” in every supported language
+- [ ] Add forgot-password and public reset-password flows
+- [ ] Remove coordinate fields from store registration while retaining map-based location selection
+- [ ] Let assigned couriers report customers from an order
+- [ ] Let the site owner review reports and ban/unban the customer account and device; retain IP only as private evidence
+- [ ] Add owner analytics for top stores and products by wilaya
+- [ ] Verify public, courier, store-owner, and site-owner screens on desktop and mobile
