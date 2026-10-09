@@ -45,6 +45,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
   --color-sweet: var(--sweet);
   --color-sweet-soft: var(--sweet-soft);
   --color-sweet-cream: var(--sweet-cream);
@@ -52,46 +55,38 @@
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: oklch(0.13 0 0);
-  --foreground: oklch(0.97 0.01 90);
-  --card: oklch(0.18 0.005 90);
-  --card-foreground: oklch(0.97 0.01 90);
-  --popover: oklch(0.18 0.005 90);
-  --popover-foreground: oklch(0.97 0.01 90);
-  --primary: oklch(0.85 0.18 95);
-  --primary-foreground: oklch(0.15 0 0);
-  --secondary: oklch(0.24 0.005 90);
-  --secondary-foreground: oklch(0.97 0.01 90);
-  --muted: oklch(0.24 0.005 90);
-  --muted-foreground: oklch(0.72 0.02 90);
-  --accent: oklch(0.58 0.22 27);
-  --accent-foreground: oklch(0.98 0.01 90);
-  --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(0.98 0.01 90);
-  --border: oklch(0.28 0.01 90);
-  --input: oklch(0.28 0.01 90);
-  --ring: oklch(0.85 0.18 95);
-  --chart-1: oklch(0.85 0.18 95);
-  --chart-2: oklch(0.58 0.22 27);
-  --chart-3: oklch(0.7 0.15 60);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.18 0.005 90);
-  --sidebar-foreground: oklch(0.97 0.01 90);
-  --sidebar-primary: oklch(0.85 0.18 95);
-  --sidebar-primary-foreground: oklch(0.15 0 0);
-  --sidebar-accent: oklch(0.24 0.005 90);
-  --sidebar-accent-foreground: oklch(0.97 0.01 90);
-  --sidebar-border: oklch(0.28 0.01 90);
-  --sidebar-ring: oklch(0.85 0.18 95);
-  /* Desserts palette — taken from the cupcake logo (pink, purple, orange, cream) */
-  --sweet: oklch(0.63 0.24 0);
-  --sweet-soft: oklch(0.5 0.2 310);
-  --sweet-cream: oklch(0.82 0.16 72);
-  --sweet-foreground: oklch(0.98 0.01 90);
+  --radius: 0.5rem;
+  --background: #ffffff; --foreground: #25212b;
+  --card: #ffffff; --card-foreground: #25212b;
+  --popover: #ffffff; --popover-foreground: #25212b;
+  --primary: #cc2678; --primary-foreground: #ffffff;
+  --secondary: #f6eef7; --secondary-foreground: #64377d;
+  --muted: #f6f4f7; --muted-foreground: #706675;
+  --accent: #fbe8e7; --accent-foreground: #ac433f;
+  --destructive: #c73d49; --destructive-foreground: #ffffff;
+  --border: #e9e2ea; --input: #ded4df; --ring: #cc2678;
+  --success: #237b59; --success-foreground: #ffffff;
+  --warning: #bb5543;
+  --chart-1: #cc2678; --chart-2: #e57565; --chart-3: #8053a2; --chart-4: #237b59; --chart-5: #706675;
+  --sidebar: var(--card); --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary); --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--secondary); --sidebar-accent-foreground: var(--secondary-foreground);
+  --sidebar-border: var(--border); --sidebar-ring: var(--ring);
+  --sweet: var(--primary); --sweet-soft: #8053a2; --sweet-cream: #e57565; --sweet-foreground: #ffffff;
 }
-
+.dark {
+  --background: #18151c; --foreground: #f8f4f9;
+  --card: #231e28; --card-foreground: #f8f4f9;
+  --popover: #231e28; --popover-foreground: #f8f4f9;
+  --primary: #f17bb4; --primary-foreground: #301321;
+  --secondary: #37263f; --secondary-foreground: #ddc1ed;
+  --muted: #2d2632; --muted-foreground: #baadbf;
+  --accent: #452b2d; --accent-foreground: #f6a99b;
+  --destructive: #fa8993; --destructive-foreground: #35151a;
+  --border: #403447; --input: #504058; --ring: #f17bb4;
+  --success: #73d2a6; --success-foreground: #173525;
+  --warning: #f6a99b;
+}
 
 @layer base {
   * {

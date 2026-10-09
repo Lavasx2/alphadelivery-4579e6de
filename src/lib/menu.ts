@@ -1,4 +1,5 @@
 export interface MenuItem {
+  translations?: Record<string, Record<string, string>>;
   id: string;
   name: string;
   description: string;

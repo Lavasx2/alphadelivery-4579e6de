@@ -3,6 +3,13 @@ import type { MenuItem } from "./menu";
 
 /** Category labels per language (key = Arabic category name used in data). */
 export const CATEGORY_LABELS: Record<string, { en: string; fr: string }> = {
+  مطاعم: { en: "Restaurants", fr: "Restaurants" },
+  حلويات: { en: "Desserts", fr: "Pâtisseries" },
+  مخابز: { en: "Bakeries", fr: "Boulangeries" },
+  مقاهي: { en: "Cafés", fr: "Cafés" },
+  بقالة: { en: "Groceries", fr: "Épiceries" },
+  صيدليات: { en: "Pharmacies", fr: "Pharmacies" },
+  أخرى: { en: "Other", fr: "Autres" },
   بيتزا: { en: "Pizza", fr: "Pizza" },
   طاكوس: { en: "Tacos", fr: "Tacos" },
   صوفلي: { en: "Soufflé", fr: "Soufflé" },
@@ -374,12 +381,11 @@ export function localizeSupplement(name: string, lang: Lang) {
 
 /** Returns the item with name/description/category localized when a translation exists. */
 export function localizeItem<T extends MenuItem>(item: T, lang: Lang): T {
-  if (lang === "ar") return item;
-  const tr = ITEM_LABELS[item.id]?.[lang];
+  const tr = item.translations?.[lang] ?? (lang !== "ar" ? ITEM_LABELS[item.id]?.[lang] : undefined);
   return {
     ...item,
     name: tr?.name ?? item.name,
     description: tr?.description ?? item.description,
-    category: localizeCategory(item.category, lang),
+    category: tr?.category || localizeCategory(item.category, lang),
   };
 }
