@@ -86,6 +86,82 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_bans: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          customer_user_id: string | null
+          device_id: string | null
+          id: string
+          report_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          customer_user_id?: string | null
+          device_id?: string | null
+          id?: string
+          report_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          customer_user_id?: string | null
+          device_id?: string | null
+          id?: string
+          report_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_bans_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: true
+            referencedRelation: "customer_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_reports: {
+        Row: {
+          courier_id: string
+          created_at: string
+          details: string | null
+          id: string
+          order_id: string
+          reason: string
+        }
+        Insert: {
+          courier_id: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          order_id: string
+          reason: string
+        }
+        Update: {
+          courier_id?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          order_id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_reports_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_items: {
         Row: {
           available: boolean
@@ -99,6 +175,7 @@ export type Database = {
           price: number
           sort_order: number
           store_id: string | null
+          translations: Json
         }
         Insert: {
           available?: boolean
@@ -112,6 +189,7 @@ export type Database = {
           price?: number
           sort_order?: number
           store_id?: string | null
+          translations?: Json
         }
         Update: {
           available?: boolean
@@ -125,6 +203,7 @@ export type Database = {
           price?: number
           sort_order?: number
           store_id?: string | null
+          translations?: Json
         }
         Relationships: [
           {
@@ -136,6 +215,38 @@ export type Database = {
           },
         ]
       }
+      order_security: {
+        Row: {
+          client_ip: string | null
+          created_at: string
+          customer_user_id: string | null
+          device_id: string
+          order_id: string
+        }
+        Insert: {
+          client_ip?: string | null
+          created_at?: string
+          customer_user_id?: string | null
+          device_id: string
+          order_id: string
+        }
+        Update: {
+          client_ip?: string | null
+          created_at?: string
+          customer_user_id?: string | null
+          device_id?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_security_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           accepted_at: string | null
@@ -143,6 +254,7 @@ export type Database = {
           courier_id: string | null
           created_at: string
           customer_name: string
+          customer_user_id: string | null
           delivered_at: string | null
           delivery_fee: number
           distance_km: number | null
@@ -156,6 +268,7 @@ export type Database = {
           status: string
           store_id: string | null
           total: number
+          wilaya: string | null
         }
         Insert: {
           accepted_at?: string | null
@@ -163,6 +276,7 @@ export type Database = {
           courier_id?: string | null
           created_at?: string
           customer_name: string
+          customer_user_id?: string | null
           delivered_at?: string | null
           delivery_fee?: number
           distance_km?: number | null
@@ -176,6 +290,7 @@ export type Database = {
           status?: string
           store_id?: string | null
           total: number
+          wilaya?: string | null
         }
         Update: {
           accepted_at?: string | null
@@ -183,6 +298,7 @@ export type Database = {
           courier_id?: string | null
           created_at?: string
           customer_name?: string
+          customer_user_id?: string | null
           delivered_at?: string | null
           delivery_fee?: number
           distance_km?: number | null
@@ -196,6 +312,7 @@ export type Database = {
           status?: string
           store_id?: string | null
           total?: number
+          wilaya?: string | null
         }
         Relationships: [
           {
@@ -288,7 +405,9 @@ export type Database = {
           status: string
           subscription_paid_until: string | null
           tagline: string | null
+          translations: Json
           updated_at: string
+          wilaya: string | null
         }
         Insert: {
           address?: string | null
@@ -325,7 +444,9 @@ export type Database = {
           status?: string
           subscription_paid_until?: string | null
           tagline?: string | null
+          translations?: Json
           updated_at?: string
+          wilaya?: string | null
         }
         Update: {
           address?: string | null
@@ -362,7 +483,9 @@ export type Database = {
           status?: string
           subscription_paid_until?: string | null
           tagline?: string | null
+          translations?: Json
           updated_at?: string
+          wilaya?: string | null
         }
         Relationships: []
       }

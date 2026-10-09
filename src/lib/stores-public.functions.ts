@@ -46,12 +46,13 @@ export const getStoreBySlug = createServerFn({ method: "GET" })
     const s = store as unknown as PublicStore;
     const { data: rows } = await sb
       .from("menu_items")
-      .select("id,name,description,price,category,image_url,popular")
+      .select("id,name,description,price,category,image_url,popular,translations")
       .eq("store_id", s.id)
       .eq("available", true)
       .order("sort_order", { ascending: true });
     const items: MenuItem[] = (rows ?? []).map((r) => {
       const item: MenuItem = {
+        translations: r.translations as Record<string, Record<string, string>>,
         id: r.id,
         name: r.name,
         description: r.description ?? "",

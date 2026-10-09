@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 
 export type PublicStore = {
+  translations?: Record<string, Record<string, string>>;
+  wilaya?: string | null;
   id: string;
   slug: string;
   name: string;
@@ -24,7 +26,7 @@ export type PublicStore = {
 };
 
 export const STORE_PUBLIC_COLUMNS =
-  "id,slug,name,tagline,description,category,logo_url,banner_url,phone,address,lat,lng,place_id,maps_url,primary_color,secondary_color,opening_hours,rating,rating_count,featured";
+  "translations,wilaya,id,slug,name,tagline,description,category,logo_url,banner_url,phone,address,lat,lng,place_id,maps_url,primary_color,secondary_color,opening_hours,rating,rating_count,featured";
 
 export const STORE_CATEGORIES = ["مطاعم", "حلويات", "مخابز", "مقاهي", "بقالة", "صيدليات", "أخرى"];
 
@@ -39,7 +41,7 @@ function readableOn(hex: string) {
 
 /** CSS variable overrides so the whole store page adopts the brand colours. */
 export function storeTheme(primary?: string | null, secondary?: string | null): CSSProperties {
-  const p = primary && /^#[0-9a-f]{6}$/i.test(primary) ? primary : "#facc15";
+  const p = primary && /^#[0-9a-f]{6}$/i.test(primary) ? primary : "#cc2678";
   const s = secondary && /^#[0-9a-f]{6}$/i.test(secondary) ? secondary : null;
   const vars: Record<string, string> = {
     "--primary": p,
@@ -62,4 +64,10 @@ export function slugify(s: string) {
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "store"
   );
+}
+
+export function localizeStore<T extends { name: string; tagline?: string | null; description?: string | null; translations?: unknown }>(store: T, lang: string): T {
+  const all = store.translations as Record<string, Record<string, string>> | undefined;
+  const tr = all?.[lang];
+  return { ...store, name: tr?.name || (lang !== "ar" && store.name === "كراست تبسة" ? "Crust Tebessa" : store.name), tagline: tr?.tagline || store.tagline, description: tr?.description || store.description };
 }
