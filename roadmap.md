@@ -17,6 +17,7 @@
 - [x] Order flow: store gets order for prep; couriers notified with pickup (store) + delivery (customer) info; cash payment
 
 ## Open — Brand, localization, safety, and analytics
+- [ ] Add persistent light/dark switch and Algeria-wide delivery selection
 - [ ] Replace yellow/black styling with the approved white, magenta, coral, and violet Alpha palette
 - [ ] Complete Arabic, English, and French translations, including editable store and menu names
 - [ ] Rename the site-owner area to “Dashboard” in every supported language
