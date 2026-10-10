@@ -1,5 +1,10 @@
 # Roadmap
 
+## Open — Uploaded upgraded edition
+- [ ] Merge upgraded interface, translations, theme, recovery and tracking while preserving current integrations and data
+- [ ] Adapt report moderation and trusted checkout to existing account/device safety schema
+- [ ] Verify imported screens and critical flows
+
 ## Done
 - [x] Link managed Google Maps Platform connection (verified: home map renders, no console errors)
 - [x] Clarify multi-vendor platform requirements with user
