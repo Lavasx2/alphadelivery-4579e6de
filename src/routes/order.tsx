@@ -6,6 +6,8 @@ import { useCart } from "@/lib/cart";
 import { RESTAURANT, formatPrice } from "@/lib/menu";
 import { useI18n } from "@/lib/i18n";
 import { quoteDelivery } from "@/lib/delivery.functions";
+import { submitOrder as submitOrderFn } from "@/lib/order-submit.functions";
+import { WILAYAS, getDeviceId } from "@/lib/wilayas";
 
 const MapPicker = lazy(() => import("@/components/MapPicker"));
 
@@ -83,6 +85,7 @@ function OrderPage() {
     );
   }
 
+  const [wilaya, setWilaya] = useState("");
   async function submitOrder(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -99,7 +102,9 @@ function OrderPage() {
       return;
     }
     setLoading(true);
-    const { error: dbError } = await supabase.from("orders").insert({
+    const res = await submitOrderFn({ data: {
+      wilaya: wilaya || null,
+      device_id: getDeviceId(),
       customer_name: name.trim() || "زائر",
       phone: phone.trim(),
       address: address.trim() || `${quote.lat.toFixed(6)}, ${quote.lng.toFixed(6)}`,
@@ -117,9 +122,9 @@ function OrderPage() {
       lng: quote.lng,
       maps_url: quote.mapsUrl,
       store_id: store?.id ?? null,
-    });
+    } }).catch(() => ({ ok: false as const }));
     setLoading(false);
-    if (dbError) {
+    if (!res.ok) {
       setError(t("orderError"));
       return;
     }
