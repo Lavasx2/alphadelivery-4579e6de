@@ -45,6 +45,15 @@ function AuthPage() {
     }
   }, [loading, session, isOwner, isCourier, navigate]);
 
+  async function forgot() {
+    setErr(null); setMsg(null);
+    if (!email) { setErr(t("email")); return; }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) setErr(error.message); else setMsg(t("resetSent"));
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
@@ -144,9 +153,14 @@ function AuthPage() {
           {busy ? t("loading") : t(mode === "login" ? "login" : "signup")}
         </button>
       </form>
+      {mode === "login" && (
+        <button type="button" onClick={forgot} className="mt-3 text-sm font-bold text-primary">
+          {t("forgotPassword")}
+        </button>
+      )}
 
-      {err && <p className="mt-4 text-sm text-red-500">{err}</p>}
-      {msg && <p className="mt-4 text-sm text-green-500">{msg}</p>}
+      {err && <p className="mt-4 text-sm text-destructive">{err}</p>}
+      {msg && <p className="mt-4 text-sm text-primary">{msg}</p>}
 
       <p className="mt-8 text-sm text-muted-foreground">
         {t("becomeCourier")} —{" "}
