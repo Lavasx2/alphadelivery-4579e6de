@@ -216,7 +216,7 @@ function Footer() {
         </div>
         <nav className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary">{t("home")}</Link>
-          <Link to="/open-store" className="hover:text-primary">افتح متجرك</Link>
+          <Link to="/open-store" className="hover:text-primary">{t("openStore")}</Link>
           <Link to="/courier" className="hover:text-primary">{t("courierArea")}</Link>
         </nav>
       </div>

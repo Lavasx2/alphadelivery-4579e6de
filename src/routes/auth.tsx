@@ -7,16 +7,16 @@ import { useI18n } from "@/lib/i18n";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "تسجيل الدخول | كراست تبسة" },
+      { title: "تسجيل الدخول | ألفا ديليفري" },
       {
         name: "description",
         content:
-          "سجّل الدخول أو أنشئ حساباً في كراست تبسة لمتابعة طلباتك أو للعمل كموصل طلبات.",
+          "سجّل الدخول أو أنشئ حساباً في ألفا ديليفري لمتابعة طلباتك.",
       },
-      { property: "og:title", content: "تسجيل الدخول | كراست تبسة" },
+      { property: "og:title", content: "تسجيل الدخول | ألفا ديليفري" },
       {
         property: "og:description",
-        content: "حساب زبون أو موصل طلبات في مطعم كراست تبسة.",
+        content: "حساب ألفا ديليفري.",
       },
     ],
   }),
