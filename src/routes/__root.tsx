@@ -18,6 +18,7 @@ import { CartProvider, useCart } from "../lib/cart";
 import { AuthProvider } from "../lib/auth";
 import { I18nProvider, useI18n } from "../lib/i18n";
 import { AccountMenu, LanguageSwitcher } from "../components/HeaderControls";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 function NotFoundComponent() {
   return (
@@ -180,8 +181,9 @@ function Header() {
             className={`hidden md:inline-flex ${linkCls}`}
             activeProps={{ className: activeCls }}
           >
-            افتح متجرك
+            {t("openStore")}
           </Link>
+          <ThemeToggle />
           <LanguageSwitcher />
           <AccountMenu />
           <Link
