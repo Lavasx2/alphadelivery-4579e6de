@@ -69,5 +69,5 @@ export function slugify(s: string) {
 export function localizeStore<T extends { name: string; tagline?: string | null; description?: string | null; translations?: unknown }>(store: T, lang: string): T {
   const all = store.translations as Record<string, Record<string, string>> | undefined;
   const tr = all?.[lang];
-  return { ...store, name: tr?.name || (lang !== "ar" && store.name === "كراست تبسة" ? "Crust Tebessa" : store.name), tagline: tr?.tagline || store.tagline, description: tr?.description || store.description };
+  return { ...store, name: tr?.["name"] || store.name, tagline: tr?.["tagline"] || store.tagline, description: tr?.["description"] || store.description };
 }

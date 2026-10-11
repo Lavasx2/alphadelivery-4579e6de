@@ -5,6 +5,7 @@ import {
   createRootRouteWithContext,
   useRouter,
   HeadContent,
+  type ErrorComponentProps,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
@@ -17,6 +18,7 @@ import { CartProvider, useCart } from "../lib/cart";
 import { AuthProvider } from "../lib/auth";
 import { I18nProvider, useI18n } from "../lib/i18n";
 import { AccountMenu, LanguageSwitcher } from "../components/HeaderControls";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 function NotFoundComponent() {
   return (
@@ -42,7 +44,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -62,7 +64,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           <button
             onClick={() => {
               router.invalidate();
-              reset();
+              reset?.();
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
@@ -179,8 +181,9 @@ function Header() {
             className={`hidden md:inline-flex ${linkCls}`}
             activeProps={{ className: activeCls }}
           >
-            افتح متجرك
+            {t("openStore")}
           </Link>
+          <ThemeToggle />
           <LanguageSwitcher />
           <AccountMenu />
           <Link
@@ -215,7 +218,7 @@ function Footer() {
         </div>
         <nav className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary">{t("home")}</Link>
-          <Link to="/open-store" className="hover:text-primary">افتح متجرك</Link>
+          <Link to="/open-store" className="hover:text-primary">{t("openStore")}</Link>
           <Link to="/courier" className="hover:text-primary">{t("courierArea")}</Link>
         </nav>
       </div>

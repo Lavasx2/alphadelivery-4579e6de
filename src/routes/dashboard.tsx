@@ -9,16 +9,16 @@ import { addOwnerByEmail, uploadMenuImage } from "@/lib/menu-admin.functions";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "لوحة المطعم | كراست تبسة" },
+      { title: "لوحة التحكم | ألفا ديليفري" },
       {
         name: "description",
         content:
-          "لوحة تحكم صاحب مطعم كراست تبسة: متابعة الطلبات، تعديل المنيو والأسعار والصور، والموافقة على الموصلين.",
+          "لوحة تحكم ألفا ديليفري: الطلبات، المتاجر، الموصلون، البلاغات والإحصائيات.",
       },
-      { property: "og:title", content: "لوحة المطعم | كراست تبسة" },
+      { property: "og:title", content: "لوحة التحكم | ألفا ديليفري" },
       {
         property: "og:description",
-        content: "إدارة الطلبات والمنيو والموصلين في كراست تبسة.",
+        content: "إدارة منصة ألفا ديليفري.",
       },
     ],
   }),

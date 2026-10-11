@@ -17,6 +17,7 @@ import { Route as MenuRouteImport } from './routes/menu'
 import { Route as MyStoreRouteImport } from './routes/my-store'
 import { Route as OpenStoreRouteImport } from './routes/open-store'
 import { Route as OrderRouteImport } from './routes/order'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as StoreSlugRouteImport } from './routes/store.$slug'
 import { Route as ApiPublicMenuImageRouteImport } from './routes/api/public/menu-image'
 
@@ -60,6 +61,11 @@ const OrderRoute = OrderRouteImport.update({
   path: '/order',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StoreSlugRoute = StoreSlugRouteImport.update({
   id: '/store/$slug',
   path: '/store/$slug',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/my-store': typeof MyStoreRoute
   '/open-store': typeof OpenStoreRoute
   '/order': typeof OrderRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
 }
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/my-store': typeof MyStoreRoute
   '/open-store': typeof OpenStoreRoute
   '/order': typeof OrderRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
 }
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/my-store': typeof MyStoreRoute
   '/open-store': typeof OpenStoreRoute
   '/order': typeof OrderRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/store/$slug': typeof StoreSlugRoute
   '/api/public/menu-image': typeof ApiPublicMenuImageRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/my-store'
     | '/open-store'
     | '/order'
+    | '/reset-password'
     | '/store/$slug'
     | '/api/public/menu-image'
   fileRoutesByTo: FileRoutesByTo
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/my-store'
     | '/open-store'
     | '/order'
+    | '/reset-password'
     | '/store/$slug'
     | '/api/public/menu-image'
   id:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/my-store'
     | '/open-store'
     | '/order'
+    | '/reset-password'
     | '/store/$slug'
     | '/api/public/menu-image'
   fileRoutesById: FileRoutesById
@@ -156,6 +168,7 @@ export interface RootRouteChildren {
   MyStoreRoute: typeof MyStoreRoute
   OpenStoreRoute: typeof OpenStoreRoute
   OrderRoute: typeof OrderRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   StoreSlugRoute: typeof StoreSlugRoute
   ApiPublicMenuImageRoute: typeof ApiPublicMenuImageRoute
 }
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/store/$slug': {
       id: '/store/$slug'
       path: '/store/$slug'
@@ -244,6 +264,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyStoreRoute: MyStoreRoute,
   OpenStoreRoute: OpenStoreRoute,
   OrderRoute: OrderRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   StoreSlugRoute: StoreSlugRoute,
   ApiPublicMenuImageRoute: ApiPublicMenuImageRoute,
 }

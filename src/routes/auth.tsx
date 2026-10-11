@@ -7,16 +7,16 @@ import { useI18n } from "@/lib/i18n";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "تسجيل الدخول | كراست تبسة" },
+      { title: "تسجيل الدخول | ألفا ديليفري" },
       {
         name: "description",
         content:
-          "سجّل الدخول أو أنشئ حساباً في كراست تبسة لمتابعة طلباتك أو للعمل كموصل طلبات.",
+          "سجّل الدخول أو أنشئ حساباً في ألفا ديليفري لمتابعة طلباتك.",
       },
-      { property: "og:title", content: "تسجيل الدخول | كراست تبسة" },
+      { property: "og:title", content: "تسجيل الدخول | ألفا ديليفري" },
       {
         property: "og:description",
-        content: "حساب زبون أو موصل طلبات في مطعم كراست تبسة.",
+        content: "حساب ألفا ديليفري.",
       },
     ],
   }),
@@ -44,6 +44,15 @@ function AuthPage() {
       else navigate({ to: "/" });
     }
   }, [loading, session, isOwner, isCourier, navigate]);
+
+  async function forgot() {
+    setErr(null); setMsg(null);
+    if (!email) { setErr(t("email")); return; }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) setErr(error.message); else setMsg(t("resetSent"));
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -144,9 +153,14 @@ function AuthPage() {
           {busy ? t("loading") : t(mode === "login" ? "login" : "signup")}
         </button>
       </form>
+      {mode === "login" && (
+        <button type="button" onClick={forgot} className="mt-3 text-sm font-bold text-primary">
+          {t("forgotPassword")}
+        </button>
+      )}
 
-      {err && <p className="mt-4 text-sm text-red-500">{err}</p>}
-      {msg && <p className="mt-4 text-sm text-green-500">{msg}</p>}
+      {err && <p className="mt-4 text-sm text-destructive">{err}</p>}
+      {msg && <p className="mt-4 text-sm text-primary">{msg}</p>}
 
       <p className="mt-8 text-sm text-muted-foreground">
         {t("becomeCourier")} —{" "}
