@@ -381,11 +381,13 @@ export function localizeSupplement(name: string, lang: Lang) {
 
 /** Returns the item with name/description/category localized when a translation exists. */
 export function localizeItem<T extends MenuItem>(item: T, lang: Lang): T {
-  const tr = item.translations?.[lang] ?? (lang !== "ar" ? ITEM_LABELS[item.id]?.[lang] : undefined);
+  const tr = (item.translations?.[lang] ?? (lang !== "ar" ? ITEM_LABELS[item.id]?.[lang] : undefined)) as
+    | { name?: string; description?: string; category?: string }
+    | undefined;
   return {
     ...item,
-    name: tr?.name ?? item.name,
-    description: tr?.description ?? item.description,
+    name: tr?.name || item.name,
+    description: tr?.description || item.description,
     category: tr?.category || localizeCategory(item.category, lang),
   };
 }
