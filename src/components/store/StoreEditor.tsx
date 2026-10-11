@@ -177,14 +177,6 @@ export function StoreProfileForm({ value, onChange }: { value: StoreDraft; onCha
         <Field label="رابط قوقل مابس">
           <input className={inputCls} dir="ltr" value={value.maps_url} onChange={(e) => set("maps_url")(e.target.value)} />
         </Field>
-        <div className="grid grid-cols-2 gap-2">
-          <Field label="خط العرض">
-            <input className={inputCls} dir="ltr" value={value.lat} onChange={(e) => set("lat")(e.target.value)} />
-          </Field>
-          <Field label="خط الطول">
-            <input className={inputCls} dir="ltr" value={value.lng} onChange={(e) => set("lng")(e.target.value)} />
-          </Field>
-        </div>
         <div className="sm:col-span-2">
           <button
             type="button"
@@ -195,7 +187,7 @@ export function StoreProfileForm({ value, onChange }: { value: StoreDraft; onCha
               )
             }
           >
-            استخدم موقعي الحالي كموقع المتجر
+            {value.lat ? "✓ " : ""}استخدم موقعي الحالي كموقع المتجر
           </button>
         </div>
         <Field label="اللون الأساسي">
