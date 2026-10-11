@@ -274,6 +274,20 @@ function OrderPage() {
                 </p>
               </div>
               <div>
+                <label className="mb-1 block text-sm font-medium">{t("wilaya")}</label>
+                <select
+                  value={wilaya}
+                  onChange={(e) => setWilaya(e.target.value)}
+                  required
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                >
+                  <option value="">—</option>
+                  {WILAYAS.map((w, i) => (
+                    <option key={w} value={w}>{String(i + 1).padStart(2, "0")} - {w}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <label className="mb-1 block text-sm font-medium">
                   {t("notesOptional")}
                 </label>
