@@ -6,6 +6,8 @@ import { useCart } from "@/lib/cart";
 import { RESTAURANT, formatPrice } from "@/lib/menu";
 import { useI18n } from "@/lib/i18n";
 import { quoteDelivery } from "@/lib/delivery.functions";
+import { submitOrder as submitOrderFn } from "@/lib/order-submit.functions";
+import { WILAYAS, getDeviceId } from "@/lib/wilayas";
 
 const MapPicker = lazy(() => import("@/components/MapPicker"));
 
@@ -83,6 +85,7 @@ function OrderPage() {
     );
   }
 
+  const [wilaya, setWilaya] = useState("");
   async function submitOrder(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -99,7 +102,9 @@ function OrderPage() {
       return;
     }
     setLoading(true);
-    const { error: dbError } = await supabase.from("orders").insert({
+    const res = await submitOrderFn({ data: {
+      wilaya: wilaya || null,
+      device_id: getDeviceId(),
       customer_name: name.trim() || "زائر",
       phone: phone.trim(),
       address: address.trim() || `${quote.lat.toFixed(6)}, ${quote.lng.toFixed(6)}`,
@@ -117,9 +122,9 @@ function OrderPage() {
       lng: quote.lng,
       maps_url: quote.mapsUrl,
       store_id: store?.id ?? null,
-    });
+    } }).catch(() => ({ ok: false as const }));
     setLoading(false);
-    if (dbError) {
+    if (!res.ok) {
       setError(t("orderError"));
       return;
     }
@@ -267,6 +272,20 @@ function OrderPage() {
                 <p className="rounded-lg border border-dashed border-border bg-secondary/40 px-4 py-2.5 text-sm">
                   {address || t("addressAuto")}
                 </p>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">{t("wilaya")}</label>
+                <select
+                  value={wilaya}
+                  onChange={(e) => setWilaya(e.target.value)}
+                  required
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                >
+                  <option value="">—</option>
+                  {WILAYAS.map((w, i) => (
+                    <option key={w} value={w}>{String(i + 1).padStart(2, "0")} - {w}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium">

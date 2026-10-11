@@ -273,9 +273,26 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
                 {o.status === "delivering" && mode !== "store" && (
                   <button
                     onClick={() => void update(o.id, { status: "delivered" })}
-                    className="rounded-lg bg-green-600 px-4 py-2 text-sm font-bold text-white"
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
                   >
                     {t("markDelivered")}
+                  </button>
+                )}
+                {mode === "courier" && user && o.courier_id === user.id && (
+                  <button
+                    onClick={async () => {
+                      const reason = window.prompt(t("reportReason"));
+                      if (!reason?.trim()) return;
+                      const { error } = await supabase.from("customer_reports").insert({
+                        order_id: o.id,
+                        courier_id: user.id,
+                        reason: reason.trim().slice(0, 300),
+                      });
+                      window.alert(error ? t("reportFailed") : t("reportSent"));
+                    }}
+                    className="rounded-lg border border-destructive px-4 py-2 text-sm font-bold text-destructive"
+                  >
+                    {t("reportCustomer")}
                   </button>
                 )}
                 {mode !== "courier" && o.status === "new" && (
