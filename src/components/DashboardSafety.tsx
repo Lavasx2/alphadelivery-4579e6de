@@ -125,8 +125,8 @@ export function StatsManager() {
       }
     }
     const byWilaya = [...sw.entries()].map(([w, m]) => {
-      const [sid, v] = [...m.entries()].sort((a, b) => b[1].rev - a[1].rev)[0];
-      return { wilaya: w, store: stores[sid] ?? "—", ...v };
+      const top = [...m.entries()].sort((a, b) => b[1].rev - a[1].rev)[0]!;
+      return { wilaya: w, store: stores[top[0]] ?? "—", n: top[1].n, rev: top[1].rev };
     }).sort((a, b) => b.rev - a.rev);
     const products = [...pr.values()].sort((a, b) => b.qty - a.qty).slice(0, 30);
     return { byWilaya, products };
