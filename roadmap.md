@@ -27,8 +27,8 @@
 - [ ] Complete Arabic, English, and French translations, including editable store and menu names
 - [x] Rename the site-owner area to “Dashboard” in every supported language
 - [x] Add forgot-password and public reset-password flows
-- [ ] Remove coordinate fields from store registration while retaining map-based location selection
-- [ ] Let assigned couriers report customers from an order
-- [ ] Let the site owner review reports and ban/unban the customer account and device; retain IP only as private evidence
-- [ ] Add owner analytics for top stores and products by wilaya
+- [x] Remove coordinate fields from store registration while retaining map-based location selection
+- [x] Let assigned couriers report customers from an order
+- [x] Let the site owner review reports and ban/unban the customer account and device; retain IP only as private evidence
+- [x] Add owner analytics for top stores and products by wilaya
 - [ ] Verify public, courier, store-owner, and site-owner screens on desktop and mobile
