@@ -10,10 +10,21 @@ export const MAX_DELIVERY_KM = 16;
 export const MIN_FEE = 150;
 export const MAX_FEE = 350;
 
+/** Algeria-wide: fee keeps rising with distance up to this cap. */
+export const ALGERIA_MAX_FEE = 1800;
+/** Roughly the farthest road distance inside Algeria. */
+export const ALGERIA_MAX_KM = 2000;
+
 export function feeForDistance(km: number, maxKm = MAX_DELIVERY_KM, minFee = MIN_FEE, maxFee = MAX_FEE) {
-  const ratio = Math.min(1, Math.max(0, km / maxKm));
-  const raw = minFee + (maxFee - minFee) * ratio;
-  return Math.round(raw / 10) * 10;
+  const d = Math.max(0, km);
+  let raw: number;
+  if (d <= maxKm) {
+    raw = minFee + (maxFee - minFee) * (d / maxKm);
+  } else {
+    const ratio = Math.min(1, (d - maxKm) / Math.max(1, ALGERIA_MAX_KM - maxKm));
+    raw = maxFee + (ALGERIA_MAX_FEE - maxFee) * ratio;
+  }
+  return Math.min(ALGERIA_MAX_FEE, Math.round(raw / 10) * 10);
 }
 
 function haversineKm(lat: number, lng: number, ORIGIN: { latitude: number; longitude: number }) {
@@ -127,7 +138,7 @@ export const quoteDelivery = createServerFn({ method: "POST" })
     return {
       distanceKm,
       fee: feeForDistance(distanceKm, maxKm, minFee, maxFee),
-      outOfRange: distanceKm > maxKm,
+      outOfRange: false,
       mapsUrl: `https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}`,
       address,
       source,
