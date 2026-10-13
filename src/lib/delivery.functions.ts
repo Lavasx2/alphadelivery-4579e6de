@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { WILAYA_CENTERS, haversineKm, localFee, interWilayaFee, LOCAL_MAX_FEE } from "./delivery-pricing";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 
@@ -27,51 +28,51 @@ export function feeForDistance(km: number, maxKm = MAX_DELIVERY_KM, minFee = MIN
   return Math.min(ALGERIA_MAX_FEE, Math.round(raw / 10) * 10);
 }
 
-function haversineKm(lat: number, lng: number, ORIGIN: { latitude: number; longitude: number }) {
-  const R = 6371;
-  const dLat = ((lat - ORIGIN.latitude) * Math.PI) / 180;
-  const dLng = ((lng - ORIGIN.longitude) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((ORIGIN.latitude * Math.PI) / 180) *
-      Math.cos((lat * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
-
 export const quoteDelivery = createServerFn({ method: "POST" })
-  .inputValidator((input: { lat: number; lng: number; storeId?: string | undefined }) => {
+  .inputValidator((input: { lat?: number | null; lng?: number | null; storeId?: string | undefined; wilaya?: string | null }) => {
+    const hasCoords = input?.lat != null && input?.lng != null;
     const lat = Number(input?.lat);
     const lng = Number(input?.lng);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    if (hasCoords && (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180)) {
       throw new Error("INVALID_LOCATION");
     }
-    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-      throw new Error("INVALID_LOCATION");
-    }
+    const wilaya = typeof input?.wilaya === "string" && WILAYA_CENTERS[input.wilaya] ? input.wilaya : null;
+    if (!hasCoords && !wilaya) throw new Error("INVALID_LOCATION");
     const storeId = typeof input?.storeId === "string" ? input.storeId : undefined;
-    return { lat, lng, storeId };
+    return { lat: hasCoords ? lat : null, lng: hasCoords ? lng : null, storeId, wilaya };
   })
   .handler(async ({ data }) => {
     const lovableKey = process.env["LOVABLE_API_KEY"];
     const mapsKey = process.env["GOOGLE_MAPS_API_KEY"];
 
     let origin = ORIGIN;
-    let maxKm = MAX_DELIVERY_KM, minFee = MIN_FEE, maxFee = MAX_FEE;
+    let maxKm = MAX_DELIVERY_KM, minFee = MIN_FEE;
+    let storeWilaya: string | null = "Tébessa";
     if (data.storeId) {
       const { getStoreDeliveryConfig } = await import("@/lib/stores-public.functions");
       const cfg = await getStoreDeliveryConfig(data.storeId);
       if (cfg?.lat != null && cfg?.lng != null) origin = { latitude: cfg.lat, longitude: cfg.lng };
       if (cfg) {
         maxKm = Number(cfg.delivery_max_km) || maxKm;
-        minFee = Number(cfg.delivery_fee_min) || minFee;
-        maxFee = Number(cfg.delivery_fee_max) || maxFee;
+        minFee = Math.min(LOCAL_MAX_FEE, Number(cfg.delivery_fee_min) || minFee);
+        storeWilaya = cfg.wilaya ?? null;
       }
     }
-    let km = haversineKm(data.lat, data.lng, origin) * 1.3; // fallback: road factor
-    let source: "routes" | "estimate" = "estimate";
+    const sameWilaya = !data.wilaya || !storeWilaya || data.wilaya === storeWilaya;
 
-    if (lovableKey && mapsKey) {
+    // Same wilaya needs the exact GPS point
+    if (sameWilaya && (data.lat == null || data.lng == null)) {
+      return { needsLocation: true as const, sameWilaya, distanceKm: 0, fee: 0, outOfRange: false, mapsUrl: "", address: "", source: "estimate" as const };
+    }
+
+    const dest = data.lat != null && data.lng != null
+      ? { lat: data.lat, lng: data.lng }
+      : { lat: WILAYA_CENTERS[data.wilaya!]![0], lng: WILAYA_CENTERS[data.wilaya!]![1] };
+    let km = haversineKm({ lat: origin.latitude, lng: origin.longitude }, dest) * 1.3;
+    let source: "routes" | "estimate" = "estimate";
+    const hasPoint = data.lat != null && data.lng != null;
+
+    if (hasPoint && lovableKey && mapsKey) {
       try {
         const res = await fetch(`${GATEWAY_URL}/routes/directions/v2:computeRoutes`, {
           method: "POST",
@@ -84,7 +85,7 @@ export const quoteDelivery = createServerFn({ method: "POST" })
           body: JSON.stringify({
             origin: { location: { latLng: origin } },
             destination: {
-              location: { latLng: { latitude: data.lat, longitude: data.lng } },
+              location: { latLng: { latitude: dest.lat, longitude: dest.lng } },
             },
             travelMode: "DRIVE",
           }),
@@ -110,7 +111,7 @@ export const quoteDelivery = createServerFn({ method: "POST" })
 
     // Reverse geocode so the customer never has to type the neighbourhood
     let address = "";
-    if (lovableKey && mapsKey) {
+    if (hasPoint && lovableKey && mapsKey) {
       try {
         const geo = await fetch(
           `${GATEWAY_URL}/maps/api/geocode/json?latlng=${data.lat},${data.lng}&language=ar`,
@@ -136,10 +137,12 @@ export const quoteDelivery = createServerFn({ method: "POST" })
 
     const distanceKm = Math.round(km * 10) / 10;
     return {
+      needsLocation: false as const,
+      sameWilaya,
       distanceKm,
-      fee: feeForDistance(distanceKm, maxKm, minFee, maxFee),
+      fee: sameWilaya ? localFee(distanceKm, minFee, maxKm) : interWilayaFee(distanceKm),
       outOfRange: false,
-      mapsUrl: `https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}`,
+      mapsUrl: `https://www.google.com/maps/search/?api=1&query=${dest.lat},${dest.lng}`,
       address,
       source,
     };

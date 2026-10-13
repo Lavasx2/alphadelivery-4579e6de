@@ -70,7 +70,7 @@ export const getStoreBySlug = createServerFn({ method: "GET" })
 export async function getStoreDeliveryConfig(storeId: string) {
   const { data } = await publicClient()
     .from("stores")
-    .select("lat,lng,delivery_max_km,delivery_fee_min,delivery_fee_max")
+    .select("lat,lng,wilaya,delivery_max_km,delivery_fee_min,delivery_fee_max")
     .eq("id", storeId)
     .eq("status", "approved")
     .maybeSingle();
