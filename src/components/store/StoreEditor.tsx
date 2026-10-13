@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadMenuImage } from "@/lib/menu-admin.functions";
 import { STORE_CATEGORIES, storeTheme } from "@/lib/stores";
 import { formatPrice } from "@/lib/menu";
+import { WILAYAS } from "@/lib/wilayas";
 
 export async function uploadImage(file: File): Promise<string> {
   if (file.size > 3 * 1024 * 1024) throw new Error("الصورة كبيرة جداً (الحد 3MB)");
@@ -22,6 +23,7 @@ export type StoreDraft = {
   description: string;
   category: string;
   phone: string;
+  wilaya: string;
   address: string;
   maps_url: string;
   lat: string;
@@ -39,6 +41,7 @@ export const emptyDraft: StoreDraft = {
   description: "",
   category: STORE_CATEGORIES[0]!,
   phone: "",
+  wilaya: "",
   address: "",
   maps_url: "",
   lat: "",
@@ -59,6 +62,7 @@ export function draftToRow(d: StoreDraft) {
     description: d.description.trim().slice(0, 1000) || null,
     category: d.category,
     phone: d.phone.trim().slice(0, 30) || null,
+    wilaya: d.wilaya || null,
     address: d.address.trim().slice(0, 200) || null,
     maps_url: d.maps_url.trim().slice(0, 500) || null,
     lat: Number.isFinite(lat) ? lat : null,
@@ -81,6 +85,7 @@ export function rowToDraft(r: Record<string, unknown>): StoreDraft {
     description: s("description"),
     category: s("category") || emptyDraft.category,
     phone: s("phone"),
+    wilaya: s("wilaya"),
     address: s("address"),
     maps_url: s("maps_url"),
     lat: s("lat"),
@@ -168,6 +173,14 @@ export function StoreProfileForm({ value, onChange }: { value: StoreDraft; onCha
             <textarea rows={3} className={inputCls} value={value.description} onChange={(e) => set("description")(e.target.value)} />
           </Field>
         </div>
+        <Field label="ولاية المتجر *">
+          <select className={inputCls} value={value.wilaya} onChange={(e) => set("wilaya")(e.target.value)}>
+            <option value="">—</option>
+            {WILAYAS.map((w, i) => (
+              <option key={w} value={w}>{String(i + 1).padStart(2, "0")} - {w}</option>
+            ))}
+          </select>
+        </Field>
         <Field label="العنوان *">
           <input className={inputCls} value={value.address} onChange={(e) => set("address")(e.target.value)} />
         </Field>
