@@ -53,12 +53,18 @@ function OrderPage() {
   const grandTotal = total + (quote && !quote.outOfRange ? quote.fee : 0);
   const address = quote?.address || "";
 
-  async function quoteFor(lat: number, lng: number) {
+  const [wilaya, setWilaya] = useState("");
+  const [commune, setCommune] = useState("");
+  const [sameWilaya, setSameWilaya] = useState(true);
+  async function quoteFor(lat: number | null, lng: number | null, w = wilaya) {
     setError(null);
     setLocating(true);
     try {
-      const res = await quoteDelivery({ data: { lat, lng, storeId: store?.id } });
-      setQuote({ ...res, lat, lng });
+      const res = await quoteDelivery({ data: { lat, lng, storeId: store?.id, wilaya: w || null } });
+      setSameWilaya(res.sameWilaya);
+      if (res.needsLocation) { setQuote(null); setLocating(false); return; }
+      const c = new URL(res.mapsUrl).searchParams.get("query")?.split(",").map(Number) ?? [0, 0];
+      setQuote({ ...res, lat: lat ?? c[0]!, lng: lng ?? c[1]! });
       if (res.outOfRange) setError(t("outOfRange"));
     } catch {
       setError(t("locationDenied"));
@@ -85,11 +91,10 @@ function OrderPage() {
     );
   }
 
-  const [wilaya, setWilaya] = useState("");
   async function submitOrder(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!phone.trim()) {
+    if (!phone.trim() || !wilaya || (!sameWilaya && !commune.trim())) {
       setError(t("fillRequired"));
       return;
     }
@@ -107,7 +112,7 @@ function OrderPage() {
       device_id: getDeviceId(),
       customer_name: name.trim() || "زائر",
       phone: phone.trim(),
-      address: address.trim() || `${quote.lat.toFixed(6)}, ${quote.lng.toFixed(6)}`,
+      address: [sameWilaya ? "" : `${commune.trim()} - ${wilaya}`, address.trim()].filter(Boolean).join(" | ") || `${quote.lat.toFixed(6)}, ${quote.lng.toFixed(6)}`,
       notes: notes.trim() || null,
       items: lines.map((l) => ({
         id: l.item.id,
@@ -277,7 +282,7 @@ function OrderPage() {
                 <label className="mb-1 block text-sm font-medium">{t("wilaya")}</label>
                 <select
                   value={wilaya}
-                  onChange={(e) => setWilaya(e.target.value)}
+                  onChange={(e) => { setWilaya(e.target.value); if (e.target.value) void quoteFor(quote && sameWilaya ? quote.lat : null, quote && sameWilaya ? quote.lng : null, e.target.value); }}
                   required
                   className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
                 >
@@ -287,6 +292,14 @@ function OrderPage() {
                   ))}
                 </select>
               </div>
+              {!sameWilaya && (
+                <div>
+                  <label className="mb-1 block text-sm font-medium">{t("commune")} *</label>
+                  <input value={commune} onChange={(e) => setCommune(e.target.value)} required
+                    className="w-full rounded-lg border border-input bg-card px-4 py-3 outline-none focus:ring-2 focus:ring-ring" />
+                  <p className="mt-1 text-xs text-muted-foreground">{t("interWilayaNote")}</p>
+                </div>
+              )}
               <div>
                 <label className="mb-1 block text-sm font-medium">
                   {t("notesOptional")}
