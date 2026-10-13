@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788819608553,
+      "tag": "0000_create_orders_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788912630819,
+      "tag": "0001_auth_roles_menu_orders",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791576294101,
+      "tag": "0002_alpha_localization_reports_safety_wilaya",
+      "breakpoints": true
+    }
+  ]
 }
