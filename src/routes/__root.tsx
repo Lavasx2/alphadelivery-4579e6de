@@ -210,6 +210,7 @@ function Footer() {
   return (
     <footer className="border-t border-border bg-card">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-8 text-center sm:flex-row sm:justify-between sm:text-start">
+        <Link to="/support" className="order-last rounded-lg border border-primary px-4 py-2 text-sm font-bold text-primary">{t("support")}</Link>
         <div className="flex items-center gap-2">
           <img src={alphaLogo.url} alt="" className="size-9 rounded-lg object-cover" />
           <span className="text-lg font-extrabold">

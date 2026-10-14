@@ -278,6 +278,17 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
                     {t("markDelivered")}
                   </button>
                 )}
+                {mode === "courier" && user && o.courier_id === user.id && o.status === "delivering" && (
+                  <button
+                    onClick={() => {
+                      if (!window.confirm(t("courierCancelConfirm"))) return;
+                      void update(o.id, { status: "new", courier_id: null, accepted_at: null });
+                    }}
+                    className="rounded-lg border border-border px-4 py-2 text-sm font-bold text-muted-foreground"
+                  >
+                    {t("courierCancel")}
+                  </button>
+                )}
                 {mode === "courier" && user && o.courier_id === user.id && (
                   <button
                     onClick={async () => {
@@ -288,6 +299,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
                         courier_id: user.id,
                         reason: reason.trim().slice(0, 300),
                       });
+                      if (error) console.error(error);
                       window.alert(error ? t("reportFailed") : t("reportSent"));
                     }}
                     className="rounded-lg border border-destructive px-4 py-2 text-sm font-bold text-destructive"

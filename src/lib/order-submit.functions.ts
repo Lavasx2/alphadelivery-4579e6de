@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
+import { normalizeDzPhone } from "@/lib/phone";
 
 const schema = z.object({
   customer_name: z.string().max(100),
@@ -33,10 +34,13 @@ export const submitOrder = createServerFn({ method: "POST" })
     if (userId) ors.push(`customer_user_id.eq.${userId}`);
     const { data: bans } = await supabaseAdmin.from("customer_bans").select("id").eq("active", true).or(ors.join(",")).limit(1);
     if (bans && bans.length) return { ok: false as const };
+    const phone = normalizeDzPhone(data.phone);
+    if (!phone) return { ok: false as const, reason: "phone" as const };
+    data.phone = phone;
     const { device_id, ...row } = data;
     const { data: order, error } = await supabaseAdmin.from("orders").insert({ ...row, customer_user_id: userId }).select("id").single();
     if (error || !order) { console.error(error); return { ok: false as const }; }
     const ip = getRequestHeader("cf-connecting-ip") ?? getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
     await supabaseAdmin.from("order_security").insert({ order_id: order.id, customer_user_id: userId, device_id, client_ip: ip });
-    return { ok: true as const };
+    return { ok: true as const, id: order.id as string };
   });
