@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { formatPrice } from "@/lib/menu";
 import { addOwnerByEmail, uploadMenuImage } from "@/lib/menu-admin.functions";
 import { ReportsManager, StatsManager } from "@/components/DashboardSafety";
+import { SupportManager } from "@/components/SupportManager";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -61,7 +62,7 @@ function DashboardPage() {
   const { t } = useI18n();
   const { session, isOwner, loading } = useAuth();
   const [tab, setTab] = useState<
-    "orders" | "stores" | "menu" | "couriers" | "owners" | "settings" | "reports" | "stats"
+    "orders" | "stores" | "menu" | "couriers" | "owners" | "settings" | "reports" | "stats" | "support"
   >("orders");
 
 
@@ -91,6 +92,7 @@ function DashboardPage() {
     { id: "stores", label: t("storesTab") },
     { id: "reports", label: t("reportsTab") },
     { id: "stats", label: t("statsTab") },
+    { id: "support", label: t("support") },
     { id: "menu", label: t("manageMenu") },
     { id: "couriers", label: t("couriers") },
     { id: "owners", label: t("owners") },
@@ -122,6 +124,7 @@ function DashboardPage() {
       {tab === "stores" && <StoresManager />}
       {tab === "reports" && <ReportsManager />}
       {tab === "stats" && <StatsManager />}
+      {tab === "support" && <SupportManager />}
       {tab === "menu" && <MenuManager />}
       {tab === "couriers" && <CouriersManager />}
       {tab === "owners" && <OwnersManager />}
