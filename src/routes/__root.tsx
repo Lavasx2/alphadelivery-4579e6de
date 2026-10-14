@@ -7,6 +7,7 @@ import {
   HeadContent,
   type ErrorComponentProps,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { ShoppingBag } from "lucide-react";
@@ -117,7 +118,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { rel: "icon", href: "/favicon.png", type: "image/png" },
         { rel: "manifest", href: "/manifest.webmanifest" },
         { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-
 
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         {
@@ -232,6 +232,7 @@ function Footer() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isLoading = useRouterState({ select: (s) => s.isLoading });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -239,6 +240,10 @@ function RootComponent() {
         <AuthProvider>
           <CartProvider>
             <div className="flex min-h-screen flex-col">
+              {/* شريط التحميل العلوي عند التنقل بين الصفحات */}
+              {isLoading && (
+                <div className="fixed inset-x-0 top-0 z-[100] h-1 bg-primary animate-pulse" />
+              )}
               <Header />
               <main className="flex-1">
                 <Outlet />
