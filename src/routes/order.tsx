@@ -1,5 +1,7 @@
 import { ClientOnly, createFileRoute, Link } from "@tanstack/react-router";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { normalizeDzPhone } from "@/lib/phone";
+import { OrderStatusCard } from "@/components/OrderStatusCard";
 import { Bike, CheckCircle2, MapPin, Minus, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/lib/cart";
@@ -37,7 +39,8 @@ function OrderPage() {
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  useEffect(() => { setActiveId(localStorage.getItem("alpha-active-order")); }, []);
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
   const [quote, setQuote] = useState<{
@@ -98,6 +101,10 @@ function OrderPage() {
       setError(t("fillRequired"));
       return;
     }
+    if (!normalizeDzPhone(phone)) {
+      setError(t("invalidPhone"));
+      return;
+    }
     if (!quote) {
       setError(t("locationRequired"));
       return;
@@ -130,29 +137,22 @@ function OrderPage() {
     } }).catch(() => ({ ok: false as const }));
     setLoading(false);
     if (!res.ok) {
-      setError(t("orderError"));
+      setError("reason" in res && res.reason === "phone" ? t("invalidPhone") : t("orderError"));
       return;
     }
     clear();
-    setDone(true);
+    if ("id" in res && res.id) {
+      localStorage.setItem("alpha-active-order", res.id);
+      setActiveId(res.id);
+    }
   }
 
-  if (done) {
+  if (activeId) {
     return (
-      <div className="mx-auto flex max-w-lg flex-col items-center px-4 py-24 text-center">
-        <CheckCircle2 className="size-16 text-green-500" />
-        <h1 className="mt-6 text-3xl font-black">{t("orderDone")}</h1>
-        <p className="mt-3 text-muted-foreground">
-          {t("thanks")} {name} — {t("orderDoneDesc")}{" "}
-          <bdi dir="ltr">{phone}</bdi>
-        </p>
-        <Link
-          to="/"
-          className="mt-8 rounded-lg bg-primary px-6 py-3 font-bold text-primary-foreground hover:bg-primary/90"
-        >
-          {t("backToMenu")}
-        </Link>
-      </div>
+      <OrderStatusCard
+        id={activeId}
+        onFinished={() => { localStorage.removeItem("alpha-active-order"); setActiveId(null); }}
+      />
     );
   }
 
