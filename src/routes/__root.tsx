@@ -9,7 +9,7 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ShoppingBag } from "lucide-react";
 import alphaLogo from "../assets/alpha-logo.jpg.asset.json";
 
@@ -232,7 +232,30 @@ function Footer() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const isLoading = useRouterState({ select: (s) => s.isLoading });
+  const isLoading = useRouterState({ select: (s) => s.isLoading || s.isTransitioning });
+  
+  const [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (isLoading) {
+      setVisible(true);
+      setProgress(25);
+      const t1 = setTimeout(() => setProgress(65), 120);
+      const t2 = setTimeout(() => setProgress(85), 350);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    } else {
+      setProgress(100);
+      const t = setTimeout(() => {
+        setVisible(false);
+        setProgress(0);
+      }, 300);
+      return () => clearTimeout(t);
+    }
+  }, [isLoading]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -240,9 +263,13 @@ function RootComponent() {
         <AuthProvider>
           <CartProvider>
             <div className="flex min-h-screen flex-col">
-              {/* شريط التحميل العلوي عند التنقل بين الصفحات */}
-              {isLoading && (
-                <div className="fixed inset-x-0 top-0 z-[100] h-1 bg-primary animate-pulse" />
+              {visible && (
+                <div className="fixed inset-x-0 top-0 z-[100] h-1 bg-background/20">
+                  <div
+                    className="h-full bg-primary transition-all duration-300 ease-out"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
               )}
               <Header />
               <main className="flex-1">
