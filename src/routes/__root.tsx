@@ -232,7 +232,7 @@ function Footer() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const isLoading = useRouterState({ select: (s) => s.isLoading || s.isTransitioning });
+  const isLoading = useRouterState({ select: (s) => s.isLoading || s.status === "pending" });
   
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
