@@ -715,6 +715,7 @@ type AdminStore = {
 };
 
 function StoresManager() {
+  const { t } = useI18n();
   const [rows, setRows] = useState<AdminStore[]>([]);
   const [fee, setFee] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
