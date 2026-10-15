@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { tr } from "@/lib/tr";
 import { useMemo, useState } from "react";
 import { Flame, MapPin, Phone, ShoppingBag, Star, UtensilsCrossed, ArrowRight } from "lucide-react";
 import crustBanner from "@/assets/crust-banner.jpg.asset.json";
@@ -35,14 +36,14 @@ export const Route = createFileRoute("/store/$slug")({
   },
   errorComponent: () => (
     <div className="mx-auto max-w-6xl px-4 py-16 text-center">
-      <h1 className="text-2xl font-black">تعذّر تحميل المتجر</h1>
-      <p className="mt-2 text-muted-foreground">حاول تحديث الصفحة من فضلك.</p>
+      <h1 className="text-2xl font-black">{tr("تعذّر تحميل المتجر")}</h1>
+      <p className="mt-2 text-muted-foreground">{tr("حاول تحديث الصفحة من فضلك.")}</p>
     </div>
   ),
   notFoundComponent: () => (
     <div className="mx-auto max-w-6xl px-4 py-16 text-center">
-      <h1 className="text-2xl font-black">هذا المتجر غير متوفر</h1>
-      <Link to="/" className="mt-4 inline-block font-bold text-primary">تصفح المتاجر</Link>
+      <h1 className="text-2xl font-black">{tr("هذا المتجر غير متوفر")}</h1>
+      <Link to="/" className="mt-4 inline-block font-bold text-primary">{tr("تصفح المتاجر")}</Link>
     </div>
   ),
   component: StorePage,
@@ -92,7 +93,7 @@ function StorePage() {
         </div>
         <div className="relative mx-auto flex max-w-6xl flex-col gap-5 px-4 py-12 sm:py-20">
           <Link to="/" className="inline-flex w-fit items-center gap-1 text-sm font-bold text-muted-foreground hover:text-foreground">
-            <ArrowRight className="size-4" /> كل المتاجر
+            <ArrowRight className="size-4" /> {tr("كل المتاجر")}
           </Link>
           <div className="flex items-center gap-4">
             {store.logo_url ? (
@@ -143,7 +144,7 @@ function StorePage() {
             </button>
           ))}
         </div>
-        {shown.length === 0 && <p className="mt-8 text-muted-foreground">لا توجد منتجات بعد.</p>}
+        {shown.length === 0 && <p className="mt-8 text-muted-foreground">{tr("لا توجد منتجات بعد.")}</p>}
         <div className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {shown.map((item) => (
             <div key={item.id} className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card">

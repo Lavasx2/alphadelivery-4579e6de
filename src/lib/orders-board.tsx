@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { tr } from "@/lib/tr";
 import { MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -255,7 +256,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
                         (ord) => ord.courier_id === user.id && ord.status === "delivering"
                       );
                       if (hasActiveOrder) {
-                        setErr("عذراً، لديك طلب نشط بالفعل قيد التوصيل. يجب تسليمه أولاً قبل قبول طلب جديد.");
+                        setErr(tr("عذراً، لديك طلب نشط بالفعل قيد التوصيل. يجب تسليمه أولاً قبل قبول طلب جديد."));
                         return;
                       }
                       setErr(null);

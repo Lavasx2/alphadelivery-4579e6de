@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { tr } from "@/lib/tr";
 import {
   Outlet,
   Link,
@@ -27,17 +28,17 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">
-          الصفحة غير موجودة
+          {tr("الصفحة غير موجودة")}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
+          {tr("الصفحة التي تبحث عنها غير موجودة أو تم نقلها.")}
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            العودة للرئيسية
+            {tr("العودة للرئيسية")}
           </Link>
         </div>
       </div>
@@ -56,10 +57,10 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          حدث خطأ أثناء تحميل الصفحة
+          {tr("حدث خطأ أثناء تحميل الصفحة")}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          يمكنك المحاولة مجدداً أو العودة للصفحة الرئيسية.
+          {tr("يمكنك المحاولة مجدداً أو العودة للصفحة الرئيسية.")}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -69,13 +70,13 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            إعادة المحاولة
+            {tr("إعادة المحاولة")}
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            الرئيسية
+            {tr("الرئيسية")}
           </a>
         </div>
       </div>
@@ -98,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         {
           name: "description",
           content:
-            "ألفا ديليفري — اطلب من كل متاجر مدينتك والدفع عند الاستلام.",
+            "ألفا {tr("ديليفري")} — اطلب من كل متاجر مدينتك والدفع عند الاستلام.",
         },
         { property: "og:title", content: "ألفا ديليفري | Alpha Delivery" },
         {
@@ -165,7 +166,7 @@ function Header() {
         <Link to="/" className="flex min-w-0 items-center gap-2">
           <img src={alphaLogo.url} alt="Alpha Delivery" className="size-9 shrink-0 rounded-lg object-cover" />
           <span className="truncate text-base font-extrabold sm:text-lg">
-            ألفا <span className="text-primary">ديليفري</span>
+            {tr("ألفا")} <span className="text-primary">{tr("ديليفري")}</span>
           </span>
         </Link>
         <nav className="flex shrink-0 items-center gap-0.5 sm:gap-1">
