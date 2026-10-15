@@ -438,6 +438,18 @@ function CouriersManager() {
     await load();
   }
 
+  async function reduceMonth(app: CourierApp) {
+    if (!app.subscription_until) return;
+    setErr(null);
+    const until = new Date(app.subscription_until).getTime() - 30 * 24 * 60 * 60 * 1000;
+    const patch = until <= Date.now()
+      ? { payment_status: "unpaid", subscription_until: null }
+      : { subscription_until: new Date(until).toISOString() };
+    const { error } = await supabase.from("courier_applications").update(patch).eq("id", app.id);
+    if (error) setErr(error.message);
+    await load();
+  }
+
   async function togglePause(app: CourierApp) {
     setErr(null);
     const { error } = await supabase
@@ -520,6 +532,14 @@ function CouriersManager() {
               >
                 {a.paused ? t("resumeCourier") : t("pauseCourier")}
               </button>
+              {a.subscription_until && (
+                <button
+                  onClick={() => void reduceMonth(a)}
+                  className="rounded-xl border-2 border-red-500 px-4 py-2.5 text-sm font-black text-red-500"
+                >
+                  {t("reduceMonth")}
+                </button>
+              )}
               {!paid && (
                 <button
                   onClick={() => void verifyPayment(a)}
@@ -716,7 +736,7 @@ function StoresManager() {
 
   async function update(id: string, patch: Partial<AdminStore>) {
     const { error } = await supabase.from("stores").update(patch).eq("id", id);
-    setMsg(error ? error.message : "تم الحفظ");
+    setMsg(error ? error.message : t("saved"));
     await load();
   }
 
@@ -726,9 +746,17 @@ function StoresManager() {
     await update(s.id, { payment_status: "paid", subscription_paid_until: base.toISOString() });
   }
 
+  async function reduceYear(s: AdminStore) {
+    if (!s.subscription_paid_until) return;
+    const d = new Date(s.subscription_paid_until);
+    d.setFullYear(d.getFullYear() - 1);
+    if (d.getTime() <= Date.now()) await update(s.id, { payment_status: "unpaid", subscription_paid_until: null });
+    else await update(s.id, { subscription_paid_until: d.toISOString() });
+  }
+
   async function saveFee() {
     const { error } = await supabase.from("app_settings").upsert({ key: "store_fee", value: fee });
-    setMsg(error ? error.message : "تم حفظ رسوم الاشتراك");
+    setMsg(error ? error.message : t("feeSaved"));
   }
 
   const badge = (st: string) =>
@@ -738,39 +766,42 @@ function StoresManager() {
     <div className="mt-8 space-y-4">
       <div className="flex flex-wrap items-end gap-2 rounded-2xl border border-border bg-card p-4">
         <label className="text-sm font-semibold">
-          الاشتراك السنوي للمتجر (دج)
+          {t("storeFeeYear")}
           <input className={inputCls} value={fee} onChange={(e) => setFee(e.target.value)} />
         </label>
-        <button onClick={() => void saveFee()} className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">حفظ</button>
+        <button onClick={() => void saveFee()} className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">{t("save")}</button>
       </div>
       {msg && <p className="text-sm text-muted-foreground">{msg}</p>}
-      {rows.length === 0 && <p className="text-muted-foreground">لا توجد متاجر بعد.</p>}
+      {rows.length === 0 && <p className="text-muted-foreground">{t("noStores")}</p>}
       {rows.map((s) => (
         <div key={s.id} className="rounded-2xl border border-border bg-card p-4">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-lg font-black">{s.name}</h3>
             <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${badge(s.status)}`}>
-              {s.status === "approved" ? "مقبول" : s.status === "rejected" ? "مرفوض" : "قيد المراجعة"}
+              {s.status === "approved" ? t("stApproved") : s.status === "rejected" ? t("stRejected") : t("stPending")}
             </span>
             <span className="text-xs text-muted-foreground">{s.category}</span>
-            <Link to="/store/$slug" params={{ slug: s.slug }} className="ms-auto text-xs font-bold text-primary underline">عرض الصفحة</Link>
+            <Link to="/store/$slug" params={{ slug: s.slug }} className="ms-auto text-xs font-bold text-primary underline">{t("viewPage")}</Link>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">{s.phone} · {s.address}</p>
           <p className="mt-2 text-sm">
-            الدفع: <b>{s.payment_status === "paid" ? "مدفوع" : s.payment_status === "submitted" ? "بانتظار التحقق" : "غير مدفوع"}</b>
+            {t("paymentLbl")}: <b>{s.payment_status === "paid" ? t("paidLbl") : s.payment_status === "submitted" ? t("awaitingLbl") : t("unpaidLbl")}</b>
             {s.payment_holder && ` — ${s.payment_holder} (****${s.payment_last4 ?? ""}) ${s.payment_reference ?? ""}`}
-            {s.subscription_paid_until && ` — صالح حتى ${new Date(s.subscription_paid_until).toLocaleDateString("ar-DZ")}`}
+            {s.subscription_paid_until && ` — ${t("validUntil")} ${new Date(s.subscription_paid_until).toLocaleDateString()}`}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {s.status !== "approved" && (
-              <button onClick={() => void update(s.id, { status: "approved" })} className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-primary-foreground">قبول</button>
+              <button onClick={() => void update(s.id, { status: "approved" })} className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-primary-foreground">{t("approveBtn")}</button>
             )}
             {s.status !== "rejected" && (
-              <button onClick={() => void update(s.id, { status: "rejected" })} className="rounded-lg border border-red-500 px-3 py-1.5 text-xs font-bold text-red-600">رفض / إيقاف</button>
+              <button onClick={() => void update(s.id, { status: "rejected" })} className="rounded-lg border border-red-500 px-3 py-1.5 text-xs font-bold text-red-600">{t("rejectBtn")}</button>
             )}
-            <button onClick={() => void confirmPayment(s)} className="rounded-lg border border-border px-3 py-1.5 text-xs font-bold">تأكيد الدفع (+سنة)</button>
+            <button onClick={() => void confirmPayment(s)} className="rounded-lg border border-border px-3 py-1.5 text-xs font-bold">{t("confirmYear")}</button>
+            {s.subscription_paid_until && (
+              <button onClick={() => void reduceYear(s)} className="rounded-lg border border-red-500 px-3 py-1.5 text-xs font-bold text-red-600">{t("reduceYear")}</button>
+            )}
             <button onClick={() => void update(s.id, { featured: !s.featured })} className="rounded-lg border border-border px-3 py-1.5 text-xs font-bold">
-              {s.featured ? "إلغاء التمييز" : "تمييز"}
+              {s.featured ? t("unfeatureBtn") : t("featureBtn")}
             </button>
           </div>
         </div>
