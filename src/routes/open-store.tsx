@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { tr } from "@/lib/tr";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -30,17 +31,17 @@ function OpenStorePage() {
   if (!session)
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <h1 className="text-2xl font-black">افتح متجرك على ألفا ديليفري</h1>
-        <p className="mt-3 text-muted-foreground">سجّل الدخول أولاً لبدء تسجيل متجرك.</p>
+        <h1 className="text-2xl font-black">{tr("افتح متجرك على ألفا ديليفري")}</h1>
+        <p className="mt-3 text-muted-foreground">{tr("سجّل الدخول أولاً لبدء تسجيل متجرك.")}</p>
         <Link to="/auth" className="mt-6 inline-block rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground">
-          تسجيل الدخول
+          {tr("تسجيل الدخول")}
         </Link>
       </div>
     );
 
   async function submit() {
     if (!draft.name.trim() || !draft.phone.trim() || !draft.address.trim()) {
-      setErr("الاسم والهاتف والعنوان مطلوبة");
+      setErr(tr("الاسم والهاتف والعنوان مطلوبة"));
       return;
     }
     setBusy(true);
@@ -61,9 +62,9 @@ function OpenStorePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <h1 className="text-3xl font-black">افتح متجرك</h1>
+      <h1 className="text-3xl font-black">{tr("افتح متجرك")}</h1>
       <p className="mt-2 text-muted-foreground">
-        املأ بيانات متجرك واختر ألوانك. بعد الإرسال ستضيف المنيو من صفحة "متجري"، ويظهر متجرك للزبائن بعد موافقة الإدارة.
+        {tr("املأ بيانات متجرك واختر ألوانك. بعد الإرسال ستضيف المنيو من صفحة «متجري»، ويظهر متجرك للزبائن بعد موافقة الإدارة.")}
       </p>
       <div className="mt-8">
         <StoreProfileForm value={draft} onChange={setDraft} />
@@ -74,7 +75,7 @@ function OpenStorePage() {
         onClick={() => void submit()}
         className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-primary-foreground disabled:opacity-50"
       >
-        {busy ? "جارٍ الإرسال..." : "إرسال للمراجعة"}
+        {busy ? tr("جارٍ الإرسال...") : tr("إرسال للمراجعة")}
       </button>
     </div>
   );

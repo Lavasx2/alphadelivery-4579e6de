@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { tr } from "@/lib/tr";
 import { ImagePlus, Loader2, Pencil, Trash2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMenuImage } from "@/lib/menu-admin.functions";
@@ -7,7 +8,7 @@ import { formatPrice } from "@/lib/menu";
 import { WILAYAS } from "@/lib/wilayas";
 
 export async function uploadImage(file: File): Promise<string> {
-  if (file.size > 3 * 1024 * 1024) throw new Error("الصورة كبيرة جداً (الحد 3MB)");
+  if (file.size > 3 * 1024 * 1024) throw new Error(tr("الصورة كبيرة جداً (الحد 3MB)"));
   const buf = new Uint8Array(await file.arrayBuffer());
   let bin = "";
   buf.forEach((b) => (bin += String.fromCharCode(b)));
@@ -136,7 +137,7 @@ function ImagePick({ label, value, onChange }: { label: string; value: string; o
             try {
               onChange(await uploadImage(f));
             } catch (x) {
-              setErr(x instanceof Error ? x.message : "فشل الرفع");
+              setErr(x instanceof Error ? x.message : tr("فشل الرفع"));
             }
             setBusy(false);
           }}
@@ -152,28 +153,28 @@ export function StoreProfileForm({ value, onChange }: { value: StoreDraft; onCha
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="اسم المتجر *">
+        <Field label={tr("اسم المتجر *")}>
           <input className={inputCls} value={value.name} onChange={(e) => set("name")(e.target.value)} />
         </Field>
-        <Field label="التصنيف">
+        <Field label={tr("التصنيف")}>
           <select className={inputCls} value={value.category} onChange={(e) => set("category")(e.target.value)}>
             {STORE_CATEGORIES.map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
         </Field>
-        <Field label="شعار قصير">
+        <Field label={tr("شعار قصير")}>
           <input className={inputCls} value={value.tagline} onChange={(e) => set("tagline")(e.target.value)} />
         </Field>
-        <Field label="الهاتف *">
+        <Field label={tr("الهاتف *")}>
           <input className={inputCls} dir="ltr" value={value.phone} onChange={(e) => set("phone")(e.target.value)} />
         </Field>
         <div className="sm:col-span-2">
-          <Field label="وصف المتجر">
+          <Field label={tr("وصف المتجر")}>
             <textarea rows={3} className={inputCls} value={value.description} onChange={(e) => set("description")(e.target.value)} />
           </Field>
         </div>
-        <Field label="ولاية المتجر *">
+        <Field label={tr("ولاية المتجر *")}>
           <select className={inputCls} value={value.wilaya} onChange={(e) => set("wilaya")(e.target.value)}>
             <option value="">—</option>
             {WILAYAS.map((w, i) => (
@@ -181,13 +182,13 @@ export function StoreProfileForm({ value, onChange }: { value: StoreDraft; onCha
             ))}
           </select>
         </Field>
-        <Field label="العنوان *">
+        <Field label={tr("العنوان *")}>
           <input className={inputCls} value={value.address} onChange={(e) => set("address")(e.target.value)} />
         </Field>
-        <Field label="ساعات العمل">
-          <input className={inputCls} placeholder="يومياً 11:00 - 23:00" value={value.hours} onChange={(e) => set("hours")(e.target.value)} />
+        <Field label={tr("ساعات العمل")}>
+          <input className={inputCls} placeholder={tr("يومياً 11:00 - 23:00")} value={value.hours} onChange={(e) => set("hours")(e.target.value)} />
         </Field>
-        <Field label="رابط قوقل مابس">
+        <Field label={tr("رابط قوقل مابس")}>
           <input className={inputCls} dir="ltr" value={value.maps_url} onChange={(e) => set("maps_url")(e.target.value)} />
         </Field>
         <div className="sm:col-span-2">
@@ -200,20 +201,20 @@ export function StoreProfileForm({ value, onChange }: { value: StoreDraft; onCha
               )
             }
           >
-            {value.lat ? "✓ " : ""}استخدم موقعي الحالي كموقع المتجر
+            {value.lat ? "✓ " : ""}{tr("استخدم موقعي الحالي كموقع المتجر")}
           </button>
         </div>
-        <Field label="اللون الأساسي">
+        <Field label={tr("اللون الأساسي")}>
           <input type="color" className="h-10 w-full cursor-pointer rounded-lg" value={value.primary_color} onChange={(e) => set("primary_color")(e.target.value)} />
         </Field>
-        <Field label="اللون الثانوي">
+        <Field label={tr("اللون الثانوي")}>
           <input type="color" className="h-10 w-full cursor-pointer rounded-lg" value={value.secondary_color} onChange={(e) => set("secondary_color")(e.target.value)} />
         </Field>
-        <ImagePick label="الشعار (لوقو)" value={value.logo_url} onChange={set("logo_url")} />
-        <ImagePick label="صورة الغلاف" value={value.banner_url} onChange={set("banner_url")} />
+        <ImagePick label={tr("الشعار (لوقو)")} value={value.logo_url} onChange={set("logo_url")} />
+        <ImagePick label={tr("صورة الغلاف")} value={value.banner_url} onChange={set("banner_url")} />
       </div>
       <div>
-        <p className="mb-2 text-sm font-bold">معاينة مباشرة</p>
+        <p className="mb-2 text-sm font-bold">{tr("معاينة مباشرة")}</p>
         <StorePreview d={value} />
       </div>
     </div>
@@ -230,11 +231,11 @@ export function StorePreview({ d }: { d: StoreDraft }) {
         <div className="-mt-12 size-16 overflow-hidden rounded-xl border-4 border-card bg-background">
           {d.logo_url && <img src={d.logo_url} alt="" className="size-full object-cover" />}
         </div>
-        <h3 className="mt-2 text-lg font-black">{d.name || "اسم متجرك"}</h3>
-        <p className="text-sm text-muted-foreground">{d.tagline || "شعار قصير"}</p>
+        <h3 className="mt-2 text-lg font-black">{d.name || tr("اسم متجرك")}</h3>
+        <p className="text-sm text-muted-foreground">{d.tagline || tr("شعار قصير")}</p>
         <div className="mt-3 flex gap-2">
-          <span className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground">اطلب الآن</span>
-          <span className="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground">المنيو</span>
+          <span className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground">{tr("اطلب الآن")}</span>
+          <span className="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground">{tr("المنيو")}</span>
         </div>
       </div>
     </div>
@@ -288,7 +289,7 @@ export function StoreMenuEditor({ storeId }: { storeId: string }) {
 
   async function save() {
     if (!editing || !editing.name.trim() || !editing.category.trim()) {
-      setErr("الاسم والصنف مطلوبان");
+      setErr(tr("الاسم والصنف مطلوبان"));
       return;
     }
     setBusy(true);
@@ -315,7 +316,7 @@ export function StoreMenuEditor({ storeId }: { storeId: string }) {
   }
 
   async function remove(id: string) {
-    if (!confirm("حذف هذا المنتج؟")) return;
+    if (!confirm(tr("حذف هذا المنتج؟"))) return;
     const { error } = await supabase.from("menu_items").delete().eq("id", id);
     if (error) setErr(error.message);
     await load();
@@ -326,22 +327,22 @@ export function StoreMenuEditor({ storeId }: { storeId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{rows.length} منتج</p>
+        <p className="text-sm text-muted-foreground">{rows.length} {tr("منتج")}</p>
         <button
           onClick={() => setEditing({ ...blank(), category: cats[0] ?? "" })}
           className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
         >
-          <Plus className="size-4" /> إضافة منتج
+          <Plus className="size-4" /> {tr("إضافة منتج")}
         </button>
       </div>
       {err && <p className="text-sm text-red-500">{err}</p>}
 
       {editing && (
         <div className="grid gap-3 rounded-2xl border border-primary/40 bg-card p-4 sm:grid-cols-2">
-          <Field label="الاسم *">
+          <Field label={tr("الاسم *")}>
             <input className={inputCls} value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
           </Field>
-          <Field label="الصنف * (مثلاً: بيتزا)">
+          <Field label={tr("الصنف * (مثلاً: بيتزا)")}>
             <input list="cats" className={inputCls} value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} />
             <datalist id="cats">
               {cats.map((c) => (
@@ -349,32 +350,32 @@ export function StoreMenuEditor({ storeId }: { storeId: string }) {
               ))}
             </datalist>
           </Field>
-          <Field label="السعر (دج)">
+          <Field label={tr("السعر (دج)")}>
             <input type="number" className={inputCls} value={editing.price} onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })} />
           </Field>
-          <Field label="الترتيب">
+          <Field label={tr("الترتيب")}>
             <input type="number" className={inputCls} value={editing.sort_order} onChange={(e) => setEditing({ ...editing, sort_order: Number(e.target.value) })} />
           </Field>
           <div className="sm:col-span-2">
-            <Field label="الوصف">
+            <Field label={tr("الوصف")}>
               <input className={inputCls} value={editing.description ?? ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
             </Field>
           </div>
-          <ImagePick label="صورة المنتج" value={editing.image_url ?? ""} onChange={(v) => setEditing({ ...editing, image_url: v })} />
+          <ImagePick label={tr("صورة المنتج")} value={editing.image_url ?? ""} onChange={(v) => setEditing({ ...editing, image_url: v })} />
           <div className="flex flex-col justify-center gap-2 text-sm">
             <label className="flex items-center gap-2">
-              <input type="checkbox" checked={editing.popular} onChange={(e) => setEditing({ ...editing, popular: e.target.checked })} /> الأكثر طلباً
+              <input type="checkbox" checked={editing.popular} onChange={(e) => setEditing({ ...editing, popular: e.target.checked })} /> {tr("الأكثر طلباً")}
             </label>
             <label className="flex items-center gap-2">
-              <input type="checkbox" checked={editing.available} onChange={(e) => setEditing({ ...editing, available: e.target.checked })} /> متوفر
+              <input type="checkbox" checked={editing.available} onChange={(e) => setEditing({ ...editing, available: e.target.checked })} /> {tr("متوفر")}
             </label>
           </div>
           <div className="flex gap-2 sm:col-span-2">
             <button disabled={busy} onClick={() => void save()} className="rounded-lg bg-primary px-5 py-2 text-sm font-bold text-primary-foreground disabled:opacity-50">
-              حفظ
+              {tr("حفظ")}
             </button>
             <button onClick={() => setEditing(null)} className="rounded-lg border border-border px-5 py-2 text-sm font-bold">
-              إلغاء
+              {tr("إلغاء")}
             </button>
           </div>
         </div>
@@ -395,10 +396,10 @@ export function StoreMenuEditor({ storeId }: { storeId: string }) {
                     <p className={`truncate text-sm font-bold ${r.available ? "" : "line-through opacity-60"}`}>{r.name}</p>
                     <p className="text-xs text-primary">{formatPrice(Number(r.price))}</p>
                   </div>
-                  <button aria-label="تعديل" onClick={() => setEditing(r)} className="p-2 text-muted-foreground hover:text-foreground">
+                  <button aria-label={tr("تعديل")} onClick={() => setEditing(r)} className="p-2 text-muted-foreground hover:text-foreground">
                     <Pencil className="size-4" />
                   </button>
-                  <button aria-label="حذف" onClick={() => void remove(r.id)} className="p-2 text-red-500">
+                  <button aria-label={tr("حذف")} onClick={() => void remove(r.id)} className="p-2 text-red-500">
                     <Trash2 className="size-4" />
                   </button>
                 </div>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { tr } from "@/lib/tr";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -53,31 +54,31 @@ function MyStorePage() {
   if (!session)
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <p className="text-muted-foreground">سجّل الدخول لإدارة متجرك.</p>
-        <Link to="/auth" className="mt-6 inline-block rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground">تسجيل الدخول</Link>
+        <p className="text-muted-foreground">{tr("سجّل الدخول لإدارة متجرك.")}</p>
+        <Link to="/auth" className="mt-6 inline-block rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground">{tr("تسجيل الدخول")}</Link>
       </div>
     );
   if (!store)
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <p className="text-muted-foreground">ليس لديك متجر بعد.</p>
-        <Link to="/open-store" className="mt-6 inline-block rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground">افتح متجرك</Link>
+        <p className="text-muted-foreground">{tr("ليس لديك متجر بعد.")}</p>
+        <Link to="/open-store" className="mt-6 inline-block rounded-lg bg-primary px-5 py-3 text-sm font-bold text-primary-foreground">{tr("افتح متجرك")}</Link>
       </div>
     );
 
-  const statusText = store.status === "approved" ? "متجرك ظاهر للزبائن" : store.status === "rejected" ? "تم رفض/إيقاف المتجر — تواصل مع الإدارة" : "متجرك قيد المراجعة من الإدارة";
+  const statusText = store.status === "approved" ? tr("متجرك ظاهر للزبائن") : store.status === "rejected" ? tr("تم رفض/إيقاف المتجر — تواصل مع الإدارة") : tr("متجرك قيد المراجعة من الإدارة");
   const tabs = [
-    { id: "orders", label: "الطلبات" },
-    { id: "menu", label: "المنيو" },
-    { id: "profile", label: "بيانات المتجر" },
-    { id: "sub", label: "الاشتراك" },
+    { id: "orders", label: tr("الطلبات") },
+    { id: "menu", label: tr("المنيو") },
+    { id: "profile", label: tr("بيانات المتجر") },
+    { id: "sub", label: tr("الاشتراك") },
   ] as const;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-black">{store.name}</h1>
-        <Link to="/store/$slug" params={{ slug: store.slug }} className="text-sm font-bold text-primary underline">صفحة المتجر</Link>
+        <Link to="/store/$slug" params={{ slug: store.slug }} className="text-sm font-bold text-primary underline">{tr("صفحة المتجر")}</Link>
       </div>
       <p className="mt-2 rounded-lg border border-border bg-card px-3 py-2 text-sm">{statusText}</p>
       <div className="mt-6 flex flex-wrap gap-2">
@@ -102,14 +103,14 @@ function ProfileTab({ store, onSaved }: { store: Row; onSaved: () => Promise<voi
   const [msg, setMsg] = useState<string | null>(null);
   async function save() {
     const { error } = await supabase.from("stores").update(draftToRow(d)).eq("id", store.id);
-    setMsg(error ? error.message : "تم الحفظ");
+    setMsg(error ? error.message : tr("تم الحفظ"));
     await onSaved();
   }
   return (
     <div>
       <StoreProfileForm value={d} onChange={setD} />
       {msg && <p className="mt-3 text-sm text-muted-foreground">{msg}</p>}
-      <button onClick={() => void save()} className="mt-4 rounded-lg bg-primary px-6 py-2 font-bold text-primary-foreground">حفظ</button>
+      <button onClick={() => void save()} className="mt-4 rounded-lg bg-primary px-6 py-2 font-bold text-primary-foreground">{tr("حفظ")}</button>
     </div>
   );
 }
@@ -130,14 +131,14 @@ function SubscriptionTab({ store, onSaved }: { store: Row; onSaved: () => Promis
 
   async function submit() {
     if (!holder.trim() || last4.trim().length !== 4) {
-      setMsg("أدخل اسم صاحب البطاقة وآخر 4 أرقام");
+      setMsg(tr("أدخل اسم صاحب البطاقة وآخر 4 أرقام"));
       return;
     }
     const { error } = await supabase
       .from("stores")
       .update({ payment_status: "submitted", payment_holder: holder.trim(), payment_last4: last4.trim(), payment_reference: ref.trim() || null, fee_amount: Number(s.fee) || null })
       .eq("id", store.id);
-    setMsg(error ? error.message : "تم الإرسال، بانتظار تحقق الإدارة");
+    setMsg(error ? error.message : tr("تم الإرسال، بانتظار تحقق الإدارة"));
     await onSaved();
   }
 
@@ -145,18 +146,18 @@ function SubscriptionTab({ store, onSaved }: { store: Row; onSaved: () => Promis
   return (
     <div className="max-w-lg space-y-4">
       <div className="rounded-2xl border border-border bg-card p-4 text-sm">
-        <p>الاشتراك السنوي: <b>{s.fee || "—"} دج</b></p>
+        <p>{tr("الاشتراك السنوي")}: <b>{s.fee || "—"} {tr("دج")}</b></p>
         <p className="mt-1">الحالة: <b>{store.payment_status === "paid" ? "مدفوع" : store.payment_status === "submitted" ? "بانتظار التحقق" : "غير مدفوع"}</b>{until && ` — صالح حتى ${until.toLocaleDateString("ar-DZ")}`}</p>
         {s.card && (
-          <p className="mt-3">ادفع عبر البطاقة الذهبية إلى: <b dir="ltr">{s.card}</b> ({s.holder})</p>
+          <p className="mt-3">{tr("ادفع عبر البطاقة الذهبية إلى")}: <b dir="ltr">{s.card}</b> ({s.holder})</p>
         )}
       </div>
       {store.payment_status !== "submitted" && (
         <div className="space-y-2">
-          <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="اسم صاحب البطاقة" value={holder} onChange={(e) => setHolder(e.target.value)} />
-          <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" dir="ltr" maxLength={4} placeholder="آخر 4 أرقام" value={last4} onChange={(e) => setLast4(e.target.value.replace(/\D/g, ""))} />
-          <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="رقم العملية (اختياري)" value={ref} onChange={(e) => setRef(e.target.value)} />
-          <button onClick={() => void submit()} className="rounded-lg bg-primary px-6 py-2 font-bold text-primary-foreground">أرسلت الدفع</button>
+          <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder={tr("اسم صاحب البطاقة")} value={holder} onChange={(e) => setHolder(e.target.value)} />
+          <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" dir="ltr" maxLength={4} placeholder={tr("آخر 4 أرقام")} value={last4} onChange={(e) => setLast4(e.target.value.replace(/\D/g, ""))} />
+          <input className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder={tr("رقم العملية (اختياري)")} value={ref} onChange={(e) => setRef(e.target.value)} />
+          <button onClick={() => void submit()} className="rounded-lg bg-primary px-6 py-2 font-bold text-primary-foreground">{tr("أرسلت الدفع")}</button>
         </div>
       )}
       {msg && <p className="text-sm text-muted-foreground">{msg}</p>}

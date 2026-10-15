@@ -792,6 +792,11 @@ type Ctx = {
 
 const I18nContext = createContext<Ctx | null>(null);
 
+let currentLang: Lang = "ar";
+export function getCurrentLang(): Lang {
+  return currentLang;
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("ar");
 
@@ -805,6 +810,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("crust-lang", l);
   }, []);
 
+  currentLang = lang;
   const dir = lang === "ar" ? "rtl" : "ltr";
 
   useEffect(() => {

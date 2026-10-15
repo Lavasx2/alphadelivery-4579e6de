@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { tr } from "@/lib/tr";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Globe, LogOut, User as UserIcon } from "lucide-react";
@@ -119,7 +120,7 @@ export function AccountMenu() {
                 }}
                 className="block w-full px-4 py-2 text-start text-sm hover:bg-accent/50"
               >
-                {isStoreOwner ? "متجري" : "افتح متجرك"}
+                {isStoreOwner ? tr("متجري") : tr("افتح متجرك")}
               </button>
             </li>
             <li>
