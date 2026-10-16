@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { OrdersBoard } from "@/lib/orders-board";
 import { StoreMenuEditor, StoreProfileForm, draftToRow, rowToDraft, type StoreDraft } from "@/components/store/StoreEditor";
+import { refreshStoreRating } from "@/lib/store-rating.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/my-store")({
   head: () => ({
@@ -99,10 +101,12 @@ function MyStorePage() {
 }
 
 function ProfileTab({ store, onSaved }: { store: Row; onSaved: () => Promise<void> }) {
+  const refreshRating = useServerFn(refreshStoreRating);
   const [d, setD] = useState<StoreDraft>(() => rowToDraft(store));
   const [msg, setMsg] = useState<string | null>(null);
   async function save() {
     const { error } = await supabase.from("stores").update(draftToRow(d)).eq("id", store.id);
+    if (!error) await refreshRating({ data: { storeId: store.id } }).catch(() => undefined);
     setMsg(error ? error.message : tr("تم الحفظ"));
     await onSaved();
   }

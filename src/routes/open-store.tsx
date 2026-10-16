@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { slugify } from "@/lib/stores";
 import { StoreProfileForm, draftToRow, emptyDraft, type StoreDraft } from "@/components/store/StoreEditor";
+import { refreshStoreRating } from "@/lib/store-rating.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/open-store")({
   head: () => ({
@@ -23,6 +25,7 @@ export const Route = createFileRoute("/open-store")({
 function OpenStorePage() {
   const { session, loading, refreshRoles } = useAuth();
   const navigate = useNavigate();
+  const refreshRating = useServerFn(refreshStoreRating);
   const [draft, setDraft] = useState<StoreDraft>(emptyDraft);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -40,6 +43,7 @@ function OpenStorePage() {
     );
 
   async function submit() {
+    if (!session) return;
     if (!draft.name.trim() || !draft.phone.trim() || !draft.address.trim()) {
       setErr(tr("الاسم والهاتف والعنوان مطلوبة"));
       return;
@@ -47,14 +51,16 @@ function OpenStorePage() {
     setBusy(true);
     setErr(null);
     const slug = `${slugify(draft.name) || "store"}-${Math.random().toString(36).slice(2, 6)}`;
-    const { error } = await supabase
+    const { data: created, error } = await supabase
       .from("stores")
-      .insert({ ...draftToRow(draft), slug, status: "pending", owner_user_id: session!.user.id });
+      .insert({ ...draftToRow(draft), slug, status: "pending", owner_user_id: session.user.id })
+      .select("id").single();
     if (error) {
       setErr(error.message);
       setBusy(false);
       return;
     }
+    if (created) await refreshRating({ data: { storeId: created.id } }).catch(() => undefined);
     await supabase.rpc("claim_store_owner_role");
     await refreshRoles();
     navigate({ to: "/my-store" });

@@ -118,7 +118,7 @@ function HomePage() {
                     <h3 className="truncate text-lg font-extrabold group-hover:text-primary">{st.name}</h3>
                     {st.tagline && <p className="line-clamp-1 text-sm text-muted-foreground">{st.tagline}</p>}
                     <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                      {st.rating !== null && (
+                      {st.rating != null && (st.rating_count ?? 0) > 0 && (
                         <span className="inline-flex items-center gap-1">
                           <Star className="size-3.5 fill-primary text-primary" /> {st.rating}
                         </span>

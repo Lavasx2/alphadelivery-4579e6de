@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { MenuItem } from "@/lib/menu";
 import { STORE_PUBLIC_COLUMNS, type PublicStore } from "@/lib/stores";
+import { googleRating } from "@/lib/store-ratings";
 
 function publicClient() {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
@@ -28,7 +29,7 @@ export const listStores = createServerFn({ method: "GET" }).handler(async (): Pr
     .order("featured", { ascending: false })
     .order("created_at", { ascending: true });
   if (error) throw new Error(error.message);
-  return (data ?? []) as unknown as PublicStore[];
+  return ((data ?? []) as unknown as PublicStore[]).map((store) => ({ ...store, ...googleRating(store.rating, store.rating_count) }));
 });
 
 export const getStoreBySlug = createServerFn({ method: "GET" })
@@ -43,7 +44,7 @@ export const getStoreBySlug = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!store) return null;
-    const s = store as unknown as PublicStore;
+    const s = { ...(store as unknown as PublicStore), ...googleRating(store.rating, store.rating_count) };
     const { data: rows } = await sb
       .from("menu_items")
       .select("id,name,description,price,category,image_url,popular,translations")
