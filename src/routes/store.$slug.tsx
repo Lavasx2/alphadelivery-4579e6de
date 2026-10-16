@@ -110,7 +110,7 @@ function StorePage() {
           </div>
           {store.description && <p className="max-w-xl text-muted-foreground">{store.description}</p>}
           <div className="flex flex-wrap gap-3">
-            {store.rating != null && (
+            {store.rating != null && (store.rating_count ?? 0) > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-3 py-1 text-sm font-semibold text-primary">
                 <Star className="size-4 fill-primary" /> {store.rating} · {store.rating_count ?? 0} {t("ratingOn")}
               </span>
