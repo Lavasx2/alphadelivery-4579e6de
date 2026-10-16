@@ -1,0 +1,1 @@
+ALTER TABLE public.stores ALTER COLUMN rating SET DEFAULT NULL;
