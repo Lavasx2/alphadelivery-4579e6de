@@ -1,4 +1,5 @@
 import {
+  Fragment,
   createContext,
   useCallback,
   useContext,
@@ -828,7 +829,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     [lang, setLang, dir]
   );
 
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  return (
+    <I18nContext.Provider value={value}>
+      <Fragment key={lang}>{children}</Fragment>
+    </I18nContext.Provider>
+  );
 }
 
 export function useI18n() {

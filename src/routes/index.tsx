@@ -76,7 +76,7 @@ function HomePage() {
                   cat === c ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"
                 }`}
               >
-                {c ?? tr("الكل")}
+                {c ? tr(c) : tr("الكل")}
               </button>
             ))}
           </div>
@@ -123,7 +123,7 @@ function HomePage() {
                           <Star className="size-3.5 fill-primary text-primary" /> {st.rating}
                         </span>
                       )}
-                      {st.category && <span>{st.category}</span>}
+                      {st.category && <span>{tr(st.category)}</span>}
                       {st.address && (
                         <span className="inline-flex items-center gap-1">
                           <MapPin className="size-3.5" /> <span className="line-clamp-1">{st.address}</span>
