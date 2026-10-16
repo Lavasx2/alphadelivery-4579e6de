@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         {
           name: "description",
           content:
-            "ألفا {tr("ديليفري")} — اطلب من كل متاجر مدينتك والدفع عند الاستلام.",
+            "ألفا ديليفري — اطلب من كل متاجر مدينتك والدفع عند الاستلام.",
         },
         { property: "og:title", content: "ألفا ديليفري | Alpha Delivery" },
         {
