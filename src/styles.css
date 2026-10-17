@@ -106,7 +106,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior-y: auto;
-    touch-action: pan-y pinch-zoom;
+    touch-action: auto;
     -webkit-overflow-scrolling: touch;
   }
 

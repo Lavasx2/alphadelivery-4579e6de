@@ -1,5 +1,10 @@
 # Roadmap
 
+## Current — Phone location picker
+- [ ] Full-screen map selection with one-finger dragging
+- [ ] Explicit device permission request and actionable location errors
+- [ ] Verify non-Maps interactions and location tests (live Maps requires authorized origin)
+
 ## Open — Uploaded upgraded edition
 - [ ] Merge upgraded interface, translations, theme, recovery and tracking while preserving current integrations and data
 - [ ] Adapt report moderation and trusted checkout to existing account/device safety schema
