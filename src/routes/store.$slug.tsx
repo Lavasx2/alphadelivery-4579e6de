@@ -17,7 +17,15 @@ export const Route = createFileRoute("/store/$slug")({
     return res;
   },
   head: ({ loaderData }) => {
-    if (!loaderData) return { meta: [{ title: "متجر غير متوفر | ألفا ديليفري" }, { name: "robots", content: "noindex" }] };
+    if (!loaderData) return { meta: [
+      { title: "متجر غير متوفر | ألفا ديليفري" },
+      { name: "description", content: "هذا المتجر غير متوفر حالياً على ألفا ديليفري." },
+      { property: "og:title", content: "متجر غير متوفر | ألفا ديليفري" },
+      { property: "og:description", content: "هذا المتجر غير متوفر حالياً على ألفا ديليفري." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
+    ] };
     const s = loaderData.store;
     const title = `${s.name} | ألفا ديليفري`;
     const desc = s.tagline || s.description || `اطلب من ${s.name} عبر ألفا ديليفري والدفع عند الاستلام.`;

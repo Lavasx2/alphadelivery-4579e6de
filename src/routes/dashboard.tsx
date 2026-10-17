@@ -18,6 +18,8 @@ export const Route = createFileRoute("/dashboard")({
           "لوحة تحكم ألفا ديليفري: الطلبات، المتاجر، الموصلون، البلاغات والإحصائيات.",
       },
       { property: "og:title", content: "لوحة التحكم | ألفا ديليفري" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         property: "og:description",
         content: "إدارة منصة ألفا ديليفري.",

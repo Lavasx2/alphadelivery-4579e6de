@@ -20,6 +20,15 @@ export const LANGS: { code: Lang; label: string }[] = [
 type Dict = Record<string, string>;
 
 const ar: Dict = {
+  openLocationMap: "فتح خريطة الموقع بملء الشاشة",
+  closeMap: "إغلاق الخريطة",
+  confirmLocation: "تأكيد الموقع",
+  mapLoadFailed: "تعذر تحميل الخريطة. تحقق من اتصالك أو استخدم زر تحديد موقعي.",
+  locationPermissionDenied: "إذن الموقع محظور. فعّل الموقع للهاتف واسمح به لهذا الموقع من إعدادات المتصفح. إذا كنت داخل المعاينة، افتح الموقع مباشرة وحاول مجدداً.",
+  locationTimeout: "استغرق تحديد الموقع وقتاً طويلاً. حاول مجدداً أو اختر مكانك على الخريطة.",
+  locationUnavailable: "تعذر تحديد موقع الهاتف. فعّل خدمة الموقع أو اختر مكانك على الخريطة.",
+  locationSecureRequired: "تحديد الموقع يتطلب فتح الموقع عبر اتصال HTTPS آمن.",
+  deliveryQuoteFailed: "تم اختيار الموقع، لكن تعذر حساب سعر التوصيل. حاول مجدداً.",
   invalidPhone: "رقم الهاتف خاطئ. اكتب رقماً جزائرياً صحيحاً مثل 0555123456.",
   orderStatusTitle: "حالة طلبك",
   statusPending: "في الانتظار — لم يقبله أي موصل بعد",
@@ -246,7 +255,7 @@ const ar: Dict = {
   locationTitle: "موقع التوصيل",
   locationHint:
     "شارك موقعك على قوقل مابس ليُحسب سعر التوصيل تلقائياً حسب المسافة من المطعم (من 150 دج إلى 350 دج).",
-  shareLocation: "شارك موقعي على قوقل مابس",
+  shareLocation: "تحديد موقعي تلقائياً",
   locating: "جارٍ تحديد موقعك...",
   locationDenied: "لم نتمكن من تحديد موقعك، اسمح بالوصول للموقع وحاول مرة أخرى.",
   locationRequired: "شارك موقعك أولاً لحساب سعر التوصيل.",
@@ -290,6 +299,15 @@ const ar: Dict = {
 };
 
 const en: Dict = {
+  openLocationMap: "Open full-screen location map",
+  closeMap: "Close map",
+  confirmLocation: "Confirm location",
+  mapLoadFailed: "The map could not load. Check your connection or use the locate button.",
+  locationPermissionDenied: "Location permission is blocked. Enable device location and allow this site in your browser settings. In the preview, open the site directly and try again.",
+  locationTimeout: "Location took too long. Try again or choose your position on the map.",
+  locationUnavailable: "Device location is unavailable. Enable location services or choose your position on the map.",
+  locationSecureRequired: "Location requires opening the site over a secure HTTPS connection.",
+  deliveryQuoteFailed: "Location selected, but the delivery price could not be calculated. Try again.",
   invalidPhone: "Wrong phone number. Enter a valid Algerian number like 0555123456.",
   orderStatusTitle: "Your order status",
   statusPending: "Waiting — no courier has accepted it yet",
@@ -491,7 +509,7 @@ const en: Dict = {
   locationTitle: "Delivery location",
   locationHint:
     "Share your location on Google Maps and the delivery fee is calculated automatically by distance from the restaurant (150 to 350 DZD).",
-  shareLocation: "Share my location on Google Maps",
+  shareLocation: "Locate me automatically",
   locating: "Getting your location...",
   locationDenied: "We couldn't get your location. Allow location access and try again.",
   locationRequired: "Share your location first to calculate the delivery fee.",
@@ -534,6 +552,15 @@ const en: Dict = {
 };
 
 const fr: Dict = {
+  openLocationMap: "Ouvrir la carte en plein écran",
+  closeMap: "Fermer la carte",
+  confirmLocation: "Confirmer la position",
+  mapLoadFailed: "La carte ne se charge pas. Vérifiez votre connexion ou utilisez le bouton de localisation.",
+  locationPermissionDenied: "La localisation est bloquée. Activez la position du téléphone et autorisez ce site dans les paramètres du navigateur. Dans l’aperçu, ouvrez le site directement et réessayez.",
+  locationTimeout: "La localisation a pris trop de temps. Réessayez ou choisissez votre position sur la carte.",
+  locationUnavailable: "Position du téléphone indisponible. Activez la localisation ou choisissez votre position sur la carte.",
+  locationSecureRequired: "La localisation nécessite une connexion HTTPS sécurisée.",
+  deliveryQuoteFailed: "Position sélectionnée, mais le prix de livraison n’a pas pu être calculé. Réessayez.",
   invalidPhone: "Numéro de téléphone incorrect. Entrez un numéro algérien valide comme 0555123456.",
   orderStatusTitle: "Statut de votre commande",
   statusPending: "En attente — aucun livreur ne l'a encore acceptée",
@@ -738,7 +765,7 @@ const fr: Dict = {
   locationTitle: "Lieu de livraison",
   locationHint:
     "Partagez votre position sur Google Maps : le prix de livraison est calculé automatiquement selon la distance depuis le restaurant (de 150 à 350 DA).",
-  shareLocation: "Partager ma position sur Google Maps",
+  shareLocation: "Me localiser automatiquement",
   locating: "Localisation en cours...",
   locationDenied:
     "Impossible d'obtenir votre position. Autorisez la localisation et réessayez.",
