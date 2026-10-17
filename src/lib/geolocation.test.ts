@@ -8,7 +8,7 @@ function setup(getCurrentPosition: ReturnType<typeof vi.fn>) {
 }
 describe("device location", () => {
   it("requests phone location permission and returns coordinates", async () => {
-    const get = vi.fn((success) => success({ coords: { latitude: 35.4, longitude: 8.1 } }));
+    const get = vi.fn((success, _failure, _options) => success({ coords: { latitude: 35.4, longitude: 8.1 } }));
     setup(get);
     await expect(requestDeviceLocation()).resolves.toEqual({ lat: 35.4, lng: 8.1 });
     expect(get.mock.calls[0]?.[2]).toEqual({ enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });

@@ -11,16 +11,18 @@ import { submitCourierPayment } from "@/lib/courier-payment.functions";
 export const Route = createFileRoute("/courier")({
   head: () => ({
     meta: [
-      { title: "منطقة الموصلين | كراست تبسة" },
+      { title: "منطقة الموصلين | ألفا ديليفري" },
       {
         name: "description",
         content:
-          "سجّل كموصل طلبات لدى كراست تبسة، وتابع الطلبات الجديدة واقبلها من هاتفك.",
+          "سجّل كموصل طلبات لدى ألفا ديليفري، وتابع طلبات المتاجر واقبلها من هاتفك.",
       },
-      { property: "og:title", content: "منطقة الموصلين | كراست تبسة" },
+      { property: "og:title", content: "منطقة الموصلين | ألفا ديليفري" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         property: "og:description",
-        content: "قبول طلبات التوصيل ومتابعتها لموصلي كراست تبسة.",
+        content: "قبول طلبات التوصيل ومتابعتها لموصلي ألفا ديليفري.",
       },
     ],
   }),

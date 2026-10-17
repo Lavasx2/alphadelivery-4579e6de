@@ -14,6 +14,8 @@ export const Route = createFileRoute("/auth")({
           "سجّل الدخول أو أنشئ حساباً في ألفا ديليفري لمتابعة طلباتك.",
       },
       { property: "og:title", content: "تسجيل الدخول | ألفا ديليفري" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         property: "og:description",
         content: "حساب ألفا ديليفري.",
