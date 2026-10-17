@@ -10,6 +10,8 @@ import { useI18n } from "@/lib/i18n";
 import { quoteDelivery } from "@/lib/delivery.functions";
 import { submitOrder as submitOrderFn } from "@/lib/order-submit.functions";
 import { WILAYAS, getDeviceId } from "@/lib/wilayas";
+import { Button } from "@/components/ui/button";
+import { DeviceLocationError, requestDeviceLocation } from "@/lib/geolocation";
 
 const MapPicker = lazy(() => import("@/components/MapPicker"));
 
@@ -23,6 +25,8 @@ export const Route = createFileRoute("/order")({
           "اطلب من متاجر ألفا ديليفري ونوصل لك للمنزل — أكمل سلة الطلبات وأدخل اسمك ورقم هاتفك وعنوانك.",
       },
       { property: "og:title", content: "سلة الطلب | ألفا ديليفري" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         property: "og:description",
         content: "أكمل طلبك عبر ألفا ديليفري ونوصله ساخناً إلى باب دارك.",
@@ -43,6 +47,7 @@ function OrderPage() {
   useEffect(() => { setActiveId(localStorage.getItem("alpha-active-order")); }, []);
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+  const [pickedLocation, setPickedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [quote, setQuote] = useState<{
     distanceKm: number;
     fee: number;
@@ -60,6 +65,7 @@ function OrderPage() {
   const [commune, setCommune] = useState("");
   const [sameWilaya, setSameWilaya] = useState(true);
   async function quoteFor(lat: number | null, lng: number | null, w = wilaya) {
+    if (lat !== null && lng !== null) setPickedLocation({ lat, lng });
     setError(null);
     setLocating(true);
     try {
@@ -67,31 +73,28 @@ function OrderPage() {
       setSameWilaya(res.sameWilaya);
       if (res.needsLocation) { setQuote(null); setLocating(false); return; }
       const c = new URL(res.mapsUrl).searchParams.get("query")?.split(",").map(Number) ?? [0, 0];
-      setQuote({ ...res, lat: lat ?? c[0]!, lng: lng ?? c[1]! });
+      const quoteLat = lat ?? c[0];
+      const quoteLng = lng ?? c[1];
+      if (quoteLat === undefined || quoteLng === undefined || !Number.isFinite(quoteLat) || !Number.isFinite(quoteLng)) throw new Error("Invalid location");
+      setQuote({ ...res, lat: quoteLat, lng: quoteLng });
       if (res.outOfRange) setError(t("outOfRange"));
     } catch {
-      setError(t("locationDenied"));
+      setQuote(null);
+      setError(t("deliveryQuoteFailed"));
     }
     setLocating(false);
   }
 
-  function shareLocation() {
+  async function shareLocation() {
     setError(null);
-    if (!navigator.geolocation) {
-      setError(t("locationDenied"));
-      return;
-    }
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        void quoteFor(pos.coords.latitude, pos.coords.longitude);
-      },
-      () => {
-        setLocating(false);
-        setError(t("locationDenied"));
-      },
-      { enableHighAccuracy: true, timeout: 15000 }
-    );
+    try {
+      const position = await requestDeviceLocation();
+      setPickedLocation(position);
+      await quoteFor(position.lat, position.lng);
+    } catch (e) {
+      setError(t(e instanceof DeviceLocationError ? e.key : "locationUnavailable"));
+    } finally { setLocating(false); }
   }
 
   async function submitOrder(e: React.FormEvent) {
@@ -320,14 +323,14 @@ function OrderPage() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   {t("locationHint")}
                 </p>
-                <button
+                <Button
                   type="button"
                   onClick={shareLocation}
                   disabled={locating}
                   className="mt-3 min-h-12 w-full rounded-xl border-2 border-primary/60 bg-primary/15 text-base font-bold text-primary active:scale-[0.99] disabled:opacity-60"
                 >
                   {locating ? t("locating") : t("shareLocation")}
-                </button>
+                </Button>
 
                 <p className="mt-4 text-sm font-bold">{t("pickOnMap")}</p>
                 <p className="mb-2 text-xs text-muted-foreground">
@@ -337,7 +340,7 @@ function OrderPage() {
                   <Suspense fallback={<div className="h-64 rounded-lg bg-secondary" />}>
                     <MapPicker
                       center={{ lat: store?.lat ?? RESTAURANT.lat, lng: store?.lng ?? RESTAURANT.lng }}
-                      value={quote ? { lat: quote.lat, lng: quote.lng } : null}
+                      value={pickedLocation ?? (quote ? { lat: quote.lat, lng: quote.lng } : null)}
                       onPick={(p) => void quoteFor(p.lat, p.lng)}
                     />
                   </Suspense>
