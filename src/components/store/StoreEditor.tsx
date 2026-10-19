@@ -235,7 +235,7 @@ export function StorePreview({ d }: { d: StoreDraft }) {
         <p className="text-sm text-muted-foreground">{d.tagline || tr("شعار قصير")}</p>
         <div className="mt-3 flex gap-2">
           <span className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground">{tr("اطلب الآن")}</span>
-          <span className="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground">{tr("المنيو")}</span>
+          <span className="rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground">{tr("قائمة المنتجات")}</span>
         </div>
       </div>
     </div>
