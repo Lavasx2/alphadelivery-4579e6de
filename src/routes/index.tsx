@@ -146,7 +146,7 @@ function HomePage() {
             <div className="flex items-center gap-2 font-extrabold text-primary">
               <StoreIcon className="size-6" /> {tr("افتح متجرك على ألفا")}
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">{tr("سجّل متجرك، صمّم صفحتك وأضف منيوك — ننشره بعد المراجعة.")}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{tr("سجّل متجرك، صمّم صفحتك وأضف قائمة منتجاتك — ننشره بعد المراجعة.")}</p>
           </Link>
         </div>
         <div className="mx-auto max-w-6xl px-4 pb-10">

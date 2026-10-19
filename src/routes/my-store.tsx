@@ -12,7 +12,7 @@ export const Route = createFileRoute("/my-store")({
   head: () => ({
     meta: [
       { title: "متجري | ألفا ديليفري" },
-      { name: "description", content: "لوحة صاحب المتجر: الطلبات الواردة، المنيو، بيانات المتجر والاشتراك السنوي." },
+      { name: "description", content: "لوحة صاحب المتجر: الطلبات الواردة، قائمة المنتجات، بيانات المتجر والاشتراك السنوي." },
       { property: "og:title", content: "متجري | ألفا ديليفري" },
       { property: "og:description", content: "أدر متجرك وطلباتك على ألفا ديليفري." },
       { property: "og:type", content: "website" },
@@ -71,7 +71,7 @@ function MyStorePage() {
   const statusText = store.status === "approved" ? tr("متجرك ظاهر للزبائن") : store.status === "rejected" ? tr("تم رفض/إيقاف المتجر — تواصل مع الإدارة") : tr("متجرك قيد المراجعة من الإدارة");
   const tabs = [
     { id: "orders", label: tr("الطلبات") },
-    { id: "menu", label: tr("المنيو") },
+    { id: "menu", label: tr("قائمة المنتجات") },
     { id: "profile", label: tr("بيانات المتجر") },
     { id: "sub", label: tr("الاشتراك") },
   ] as const;

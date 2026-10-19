@@ -12,7 +12,7 @@ export const Route = createFileRoute("/open-store")({
   head: () => ({
     meta: [
       { title: "افتح متجرك | ألفا ديليفري" },
-      { name: "description", content: "سجّل متجرك في ألفا ديليفري: بياناتك، ألوانك، صورك ومنيو كامل، ثم انطلق بعد الموافقة." },
+      { name: "description", content: "سجّل متجرك في ألفا ديليفري: بياناتك، ألوانك، صورك وقائمة منتجات كاملة، ثم انطلق بعد الموافقة." },
       { property: "og:title", content: "افتح متجرك | ألفا ديليفري" },
       { property: "og:description", content: "انضم إلى منصة ألفا ديليفري ووصّل طلباتك عبر شبكة موصلين موحدة." },
       { property: "og:type", content: "website" },
@@ -70,7 +70,7 @@ function OpenStorePage() {
     <div className="mx-auto max-w-6xl px-4 py-12">
       <h1 className="text-3xl font-black">{tr("افتح متجرك")}</h1>
       <p className="mt-2 text-muted-foreground">
-        {tr("املأ بيانات متجرك واختر ألوانك. بعد الإرسال ستضيف المنيو من صفحة «متجري»، ويظهر متجرك للزبائن بعد موافقة الإدارة.")}
+        {tr("املأ بيانات متجرك واختر ألوانك. بعد الإرسال ستضيف قائمة المنتجات من صفحة «متجري»، ويظهر متجرك للزبائن بعد موافقة الإدارة.")}
       </p>
       <div className="mt-8">
         <StoreProfileForm value={draft} onChange={setDraft} />
