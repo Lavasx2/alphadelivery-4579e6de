@@ -12,3 +12,4 @@
 - Store ratings are validated through the shared store-ratings helper and loaded from Google Places only in authenticated store-save flows; public pages never issue per-store Maps requests, avoiding fabricated scores and public API fan-out.
 - Location picking uses a full-screen dialog with Google Maps native gestures; document touch behavior stays unrestricted so horizontal map dragging works on phones.
 - Device geolocation is requested on explicit user actions, independently of delivery quotes, with distinct permission errors and a lower-accuracy timeout fallback.
+- The native Android app is a Capacitor shell (`capacitor.config.ts`, `www/`, `android/`) that loads the published site URL via `server.url`; content changes never require an APK rebuild. Regenerate native files with `bunx cap sync android`; icons/splash come from `assets/` via `@capacitor/assets generate --android`.
