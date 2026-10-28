@@ -16,10 +16,31 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            def uploadKeyPath = System.getenv('ANDROID_UPLOAD_KEYSTORE')
+            def uploadKeyPassword = System.getenv('ANDROID_UPLOAD_KEY_PASSWORD')
+            if (uploadKeyPath && uploadKeyPassword) {
+                storeFile file(uploadKeyPath)
+                storePassword uploadKeyPassword
+                keyAlias 'alpha-upload'
+                keyPassword uploadKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.name == 'bundleRelease' || it.name == 'assembleRelease' }) {
+        if (!System.getenv('ANDROID_UPLOAD_KEYSTORE') || !System.getenv('ANDROID_UPLOAD_KEY_PASSWORD')) {
+            throw new GradleException('Release builds require an upload keystore and password supplied through environment variables.')
         }
     }
 }
