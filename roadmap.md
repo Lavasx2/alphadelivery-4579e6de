@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Current — Google Play first release
-- [ ] Build and validate a release-signed AAB with a dedicated upload key
-- [ ] Deliver the bundle, encrypted upload-key backup, and Arabic publishing checklist
+- [x] Build and validate a release-signed AAB with a dedicated upload key
+- [x] Deliver the bundle and Arabic publishing checklist; retain encrypted upload-key backup in private project metadata
 
 ## Current — Phone location picker
 - [ ] Full-screen map selection with one-finger dragging
