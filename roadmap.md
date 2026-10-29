@@ -2,8 +2,9 @@
 
 ## Current — Android location update
 - [x] Declare foreground location permissions and increment Android version
-- [ ] Validate location behavior and release signatures
-- [ ] Deliver updated APK and AAB signed with the existing upload key
+- [x] Validate foreground permissions, geolocation unit tests, checkout location capture in Chromium, bundle structure and matching original release signatures
+- [x] Deliver updated APK and AAB signed with the existing upload key
+- [ ] Verify Android's system permission dialog on a physical phone (no Android device/emulator available here)
 
 ## Current — Google Play first release
 - [x] Build and validate a release-signed AAB with a dedicated upload key
