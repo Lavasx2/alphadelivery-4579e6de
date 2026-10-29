@@ -1,5 +1,10 @@
 # Roadmap
 
+## Current — Android location update
+- [x] Declare foreground location permissions and increment Android version
+- [ ] Validate location behavior and release signatures
+- [ ] Deliver updated APK and AAB signed with the existing upload key
+
 ## Current — Google Play first release
 - [x] Build and validate a release-signed AAB with a dedicated upload key
 - [x] Deliver the bundle and Arabic publishing checklist; retain encrypted upload-key backup in private project metadata
