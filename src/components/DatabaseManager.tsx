@@ -126,13 +126,13 @@ function RowEditor({ table, row, onDone }: { table: { name: string; pk: string }
     else onDone();
   };
 
-  const title = toText(row.name ?? row.customer_name ?? row.email ?? row.full_name ?? row.key ?? pkVal);
+  const title = toText(row["name"] ?? row["customer_name"] ?? row["email"] ?? row["full_name"] ?? row["key"] ?? pkVal);
 
   return (
     <div className="rounded-xl border border-border bg-card p-3">
       <button onClick={() => setOpen(!open)} className="flex w-full justify-between text-start text-sm font-bold">
         <span className="truncate">{title}</span>
-        <span className="text-xs text-muted-foreground">{toText(row.created_at).slice(0, 10)}</span>
+        <span className="text-xs text-muted-foreground">{toText(row["created_at"]).slice(0, 10)}</span>
       </button>
       {open && (
         <div className="mt-3 space-y-2">
@@ -140,10 +140,10 @@ function RowEditor({ table, row, onDone }: { table: { name: string; pk: string }
             <label key={k} className="block text-xs">
               <span className="font-semibold text-muted-foreground">{k}</span>
               <textarea
-                rows={draft[k].length > 60 ? 3 : 1}
+                rows={(draft[k] ?? "").length > 60 ? 3 : 1}
                 disabled={LOCKED.has(k) || k === table.pk}
                 className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-1 font-mono text-xs disabled:opacity-60"
-                value={draft[k]}
+                value={draft[k] ?? ""}
                 onChange={(e) => setDraft({ ...draft, [k]: e.target.value })}
               />
             </label>
