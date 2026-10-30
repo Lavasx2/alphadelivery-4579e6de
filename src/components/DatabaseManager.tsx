@@ -32,7 +32,7 @@ function fromText(text: string, original: unknown): unknown {
 
 export function DatabaseManager() {
   const { t } = useI18n();
-  const [table, setTable] = useState(TABLES[0]);
+  const [table, setTable] = useState(TABLES[0]!);
   const [rows, setRows] = useState<Row[]>([]);
   const [search, setSearch] = useState("");
   const [msg, setMsg] = useState("");
