@@ -7,6 +7,7 @@ import { formatPrice } from "@/lib/menu";
 import { addOwnerByEmail, uploadMenuImage } from "@/lib/menu-admin.functions";
 import { ReportsManager, StatsManager } from "@/components/DashboardSafety";
 import { SupportManager } from "@/components/SupportManager";
+import { DatabaseManager } from "@/components/DatabaseManager";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -64,7 +65,7 @@ function DashboardPage() {
   const { t } = useI18n();
   const { session, isOwner, loading } = useAuth();
   const [tab, setTab] = useState<
-    "orders" | "stores" | "menu" | "couriers" | "owners" | "settings" | "reports" | "stats" | "support"
+    "orders" | "stores" | "menu" | "couriers" | "owners" | "settings" | "reports" | "stats" | "support" | "database"
   >("orders");
 
 
@@ -99,6 +100,7 @@ function DashboardPage() {
     { id: "couriers", label: t("couriers") },
     { id: "owners", label: t("owners") },
     { id: "settings", label: t("settings") },
+    { id: "database", label: t("dbTab") },
   ] as const;
 
 
@@ -131,6 +133,7 @@ function DashboardPage() {
       {tab === "couriers" && <CouriersManager />}
       {tab === "owners" && <OwnersManager />}
       {tab === "settings" && <SettingsManager />}
+      {tab === "database" && <DatabaseManager />}
 
     </div>
   );
