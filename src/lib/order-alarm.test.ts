@@ -110,25 +110,22 @@ afterEach(() => {
 });
 
 describe("order alarm", () => {
-  it("gives the courier a 9-sweep siren built from a harsh sawtooth and square", () => {
+  it("gives the courier a repeating bell fanfare, not a siren", () => {
     setup();
     playOrderAlarm({ loud: true });
     const ctx = lastCtx();
-    // 9 cycles x 2 layers: the sawtooth wail plus a square layer on top of it.
-    expect(ctx.oscillators).toHaveLength(18);
-    expect(new Set(ctx.oscillators.map((o) => o.type))).toEqual(
-      new Set(["sawtooth", "square"]),
-    );
-    // Every sweep rises to the siren peak (>=1250 Hz) instead of a flat beep.
-    for (const osc of ctx.oscillators) {
-      expect(Math.max(...osc.frequency.ramps)).toBeGreaterThanOrEqual(1250);
-    }
-    // White-noise hits on every cycle make it read as an alarm, not a chime.
-    expect(ctx.buffers).toHaveLength(9);
+    // 4 repeats x 5 notes x 2 partials (fundamental + metallic overtone).
+    expect(ctx.oscillators).toHaveLength(40);
+    expect(new Set(ctx.oscillators.map((o) => o.type))).toEqual(new Set(["sine"]));
+    // The melody climbs to a bright 1760 Hz peak so it cuts through noise.
+    const freqs = ctx.oscillators.flatMap((o) => o.frequency.ramps.concat(o.frequency.value));
+    expect(Math.max(...freqs)).toBeGreaterThanOrEqual(1760);
+    // No noise bursts: it reads as a chime, not an alarm siren.
+    expect(ctx.buffers).toHaveLength(0);
     expect(ctx.resumed).toBe(true);
   });
 
-  it("runs the courier siren near full volume through a limiter", () => {
+  it("runs the courier fanfare near full volume through a limiter", () => {
     setup();
     playOrderAlarm({ loud: true });
     const ctx = lastCtx();
@@ -139,11 +136,12 @@ describe("order alarm", () => {
     expect(ctx.gains[0]!.gain.value).toBeGreaterThan(0.35);
   });
 
-  it("keeps the shop-owner board a short 3-sweep chime", () => {
+  it("keeps the shop-owner board a short 2-note chime", () => {
     setup();
     playOrderAlarm({});
     const ctx = lastCtx();
-    expect(ctx.oscillators).toHaveLength(3);
+    // 1 repeat x 2 notes x 2 partials.
+    expect(ctx.oscillators).toHaveLength(4);
     expect(ctx.gains[0]!.gain.value).toBe(0.55);
   });
 
@@ -156,15 +154,15 @@ describe("order alarm", () => {
     expect(vibrate).not.toHaveBeenCalled();
   });
 
-  it("rings for about 8 seconds, then reports itself finished", () => {
+  it("rings for about 10 seconds, then reports itself finished", () => {
     vi.useFakeTimers();
     setup();
     const onEnd = vi.fn();
     playOrderAlarm({ loud: true, onEnd });
     expect(isAlarmRinging()).toBe(true);
-    vi.advanceTimersByTime(8000);
+    vi.advanceTimersByTime(9000);
     expect(onEnd).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(200);
+    vi.advanceTimersByTime(1500);
     expect(onEnd).toHaveBeenCalledTimes(1);
     expect(isAlarmRinging()).toBe(false);
     expect(lastCtx().closed).toBe(true);
