@@ -128,32 +128,34 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
     <div className="mt-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs text-muted-foreground">{t("autoRefreshOn")}</span>
-        <button
-          type="button"
-          onClick={() => {
-            const next = !sound;
-            setSound(next);
-            if (next) {
-              setRinging(true);
-              playOrderAlarm({
-                loud: mode === "courier",
-                onEnd: () => setRinging(false),
-              });
-            }
-          }}
-          className="rounded-full border border-border px-3 py-1 text-xs font-bold"
-        >
-          {sound ? t("soundOn") : t("soundOff")}
-        </button>
-        {ringing && (
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => stopOrderAlarm()}
-            className="rounded-full bg-destructive px-3 py-1 text-xs font-bold text-destructive-foreground"
+            onClick={() => {
+              const next = !sound;
+              setSound(next);
+              if (next) {
+                setRinging(true);
+                playOrderAlarm({
+                  loud: mode === "courier",
+                  onEnd: () => setRinging(false),
+                });
+              }
+            }}
+            className="rounded-full border border-border px-3 py-1 text-xs font-bold"
           >
-            {t("stopAlarm")}
+            {sound ? t("soundOn") : t("soundOff")}
           </button>
-        )}
+          {ringing && (
+            <button
+              type="button"
+              onClick={() => stopOrderAlarm()}
+              className="rounded-full bg-destructive px-3 py-1 text-xs font-bold text-destructive-foreground"
+            >
+              {t("stopAlarm")}
+            </button>
+          )}
+        </div>
       </div>
       {err && <p className="text-sm text-red-500">{err}</p>}
       {visible.length === 0 && (
