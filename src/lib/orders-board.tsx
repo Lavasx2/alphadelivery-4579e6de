@@ -45,6 +45,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
   const [sound, setSound] = useState(true);
   const soundRef = useRef(sound);
   soundRef.current = sound;
+  const [ringing, setRinging] = useState(false);
   const seenRef = useRef<Set<string> | null>(null);
   const mapsKey = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY"];
 
@@ -69,11 +70,18 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
     } else {
       const fresh = newIds.filter((id) => !seenRef.current!.has(id));
       seenRef.current = new Set(newIds);
-      if (fresh.length > 0 && soundRef.current) beep();
+      if (fresh.length > 0 && soundRef.current) {
+        setRinging(true);
+        playOrderAlarm({
+          loud: mode === "courier",
+          vibrate: mode === "courier",
+          onEnd: () => setRinging(false),
+        });
+      }
     }
     setOrders(rows);
     setLoading(false);
-  }, [storeId]);
+  }, [storeId, mode]);
 
   useEffect(() => {
     void load();
