@@ -154,15 +154,15 @@ describe("order alarm", () => {
     expect(vibrate).not.toHaveBeenCalled();
   });
 
-  it("rings for about 8 seconds, then reports itself finished", () => {
+  it("rings for about 10 seconds, then reports itself finished", () => {
     vi.useFakeTimers();
     setup();
     const onEnd = vi.fn();
     playOrderAlarm({ loud: true, onEnd });
     expect(isAlarmRinging()).toBe(true);
-    vi.advanceTimersByTime(8000);
+    vi.advanceTimersByTime(9000);
     expect(onEnd).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(500);
+    vi.advanceTimersByTime(1500);
     expect(onEnd).toHaveBeenCalledTimes(1);
     expect(isAlarmRinging()).toBe(false);
     expect(lastCtx().closed).toBe(true);
