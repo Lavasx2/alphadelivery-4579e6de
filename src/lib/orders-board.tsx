@@ -96,6 +96,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
     const poll = setInterval(() => void load(), REFRESH_MS);
     return () => {
       clearInterval(poll);
+      stopOrderAlarm();
       void supabase.removeChannel(channel);
     };
   }, [load]);
@@ -132,12 +133,27 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
           onClick={() => {
             const next = !sound;
             setSound(next);
-            if (next) beep();
+            if (next) {
+              setRinging(true);
+              playOrderAlarm({
+                loud: mode === "courier",
+                onEnd: () => setRinging(false),
+              });
+            }
           }}
           className="rounded-full border border-border px-3 py-1 text-xs font-bold"
         >
           {sound ? t("soundOn") : t("soundOff")}
         </button>
+        {ringing && (
+          <button
+            type="button"
+            onClick={() => stopOrderAlarm()}
+            className="rounded-full bg-destructive px-3 py-1 text-xs font-bold text-destructive-foreground"
+          >
+            {t("stopAlarm")}
+          </button>
+        )}
       </div>
       {err && <p className="text-sm text-red-500">{err}</p>}
       {visible.length === 0 && (
