@@ -46,4 +46,5 @@
 - [x] Let assigned couriers report customers from an order
 - [x] Let the site owner review reports and ban/unban the customer account and device; retain IP only as private evidence
 - [x] Add owner analytics for top stores and products by wilaya
+- [x] Make the courier's new-order alert a loud repeating siren with phone vibration and an early stop button
 - [ ] Verify public, courier, store-owner, and site-owner screens on desktop and mobile

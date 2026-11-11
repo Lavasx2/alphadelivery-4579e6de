@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { formatPrice } from "@/lib/menu";
+import { playOrderAlarm, stopOrderAlarm } from "@/lib/order-alarm";
 import type { Database } from "@/integrations/supabase/types";
 
 type OrderLine = { name?: string; qty?: number; price?: number };
@@ -34,35 +35,6 @@ type Order = {
 const HIDE_DELIVERED_AFTER_MS = 4 * 60 * 1000;
 const REFRESH_MS = 12000;
 
-function beep() {
-  try {
-    const Ctx =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const play = (at: number, freq: number) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime + at);
-      gain.gain.exponentialRampToValueAtTime(0.35, ctx.currentTime + at + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + at + 0.3);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(ctx.currentTime + at);
-      osc.stop(ctx.currentTime + at + 0.35);
-    };
-    play(0, 880);
-    play(0.35, 1175);
-    play(0.7, 880);
-    setTimeout(() => void ctx.close(), 1500);
-  } catch {
-    /* audio unavailable */
-  }
-}
-
 export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "store"; storeId?: string }) {
   const { t } = useI18n();
   const { user } = useAuth();
@@ -73,6 +45,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
   const [sound, setSound] = useState(true);
   const soundRef = useRef(sound);
   soundRef.current = sound;
+  const [ringing, setRinging] = useState(false);
   const seenRef = useRef<Set<string> | null>(null);
   const mapsKey = import.meta.env["VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY"];
 
@@ -97,11 +70,18 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
     } else {
       const fresh = newIds.filter((id) => !seenRef.current!.has(id));
       seenRef.current = new Set(newIds);
-      if (fresh.length > 0 && soundRef.current) beep();
+      if (fresh.length > 0 && soundRef.current) {
+        setRinging(true);
+        playOrderAlarm({
+          loud: mode === "courier",
+          vibrate: mode === "courier",
+          onEnd: () => setRinging(false),
+        });
+      }
     }
     setOrders(rows);
     setLoading(false);
-  }, [storeId]);
+  }, [storeId, mode]);
 
   useEffect(() => {
     void load();
@@ -116,6 +96,7 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
     const poll = setInterval(() => void load(), REFRESH_MS);
     return () => {
       clearInterval(poll);
+      stopOrderAlarm();
       void supabase.removeChannel(channel);
     };
   }, [load]);
@@ -147,17 +128,34 @@ export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "st
     <div className="mt-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs text-muted-foreground">{t("autoRefreshOn")}</span>
-        <button
-          type="button"
-          onClick={() => {
-            const next = !sound;
-            setSound(next);
-            if (next) beep();
-          }}
-          className="rounded-full border border-border px-3 py-1 text-xs font-bold"
-        >
-          {sound ? t("soundOn") : t("soundOff")}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              const next = !sound;
+              setSound(next);
+              if (next) {
+                setRinging(true);
+                playOrderAlarm({
+                  loud: mode === "courier",
+                  onEnd: () => setRinging(false),
+                });
+              }
+            }}
+            className="rounded-full border border-border px-3 py-1 text-xs font-bold"
+          >
+            {sound ? t("soundOn") : t("soundOff")}
+          </button>
+          {ringing && (
+            <button
+              type="button"
+              onClick={() => stopOrderAlarm()}
+              className="rounded-full bg-destructive px-3 py-1 text-xs font-bold text-destructive-foreground"
+            >
+              {t("stopAlarm")}
+            </button>
+          )}
+        </div>
       </div>
       {err && <p className="text-sm text-red-500">{err}</p>}
       {visible.length === 0 && (

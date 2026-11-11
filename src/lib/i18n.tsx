@@ -277,6 +277,7 @@ const ar: Dict = {
   openInMaps: "فتح الموقع في قوقل مابس",
   soundOn: "الصوت مفعّل 🔔",
   soundOff: "الصوت متوقف 🔕",
+  stopAlarm: "⏹ إيقاف التنبيه",
   newOrderAlert: "طلبية جديدة!",
   autoRefreshOn: "تحديث تلقائي مفعّل",
 
@@ -532,6 +533,7 @@ const en: Dict = {
   openInMaps: "Open location in Google Maps",
   soundOn: "Sound on 🔔",
   soundOff: "Sound off 🔕",
+  stopAlarm: "⏹ Stop alarm",
   newOrderAlert: "New order!",
   autoRefreshOn: "Auto refresh on",
 
@@ -790,6 +792,7 @@ const fr: Dict = {
   openInMaps: "Ouvrir la position dans Google Maps",
   soundOn: "Son activé 🔔",
   soundOff: "Son désactivé 🔕",
+  stopAlarm: "⏹ Arrêter l'alarme",
   newOrderAlert: "Nouvelle commande !",
   autoRefreshOn: "Actualisation automatique activée",
 
