@@ -44,6 +44,8 @@ class FakeNode {
   }
 }
 
+const contexts: FakeCtx[] = [];
+
 class FakeCtx {
   currentTime = 0;
   sampleRate = 44100;
@@ -54,6 +56,9 @@ class FakeCtx {
   oscillators: FakeNode[] = [];
   buffers: FakeNode[] = [];
   compressors: FakeNode[] = [];
+  constructor() {
+    contexts.push(this);
+  }
   createGain() {
     const n = new FakeNode();
     this.gains.push(n);
@@ -87,15 +92,13 @@ class FakeCtx {
   }
 }
 
-let lastCtx: FakeCtx | null = null;
+function lastCtx(): FakeCtx {
+  return contexts[contexts.length - 1]!;
+}
 
 function setup(vibrate = vi.fn(() => true)) {
-  lastCtx = null;
-  const Ctor = vi.fn(() => {
-    lastCtx = new FakeCtx();
-    return lastCtx;
-  });
-  vi.stubGlobal("window", { AudioContext: Ctor });
+  contexts.length = 0;
+  vi.stubGlobal("window", { AudioContext: FakeCtx });
   vi.stubGlobal("navigator", { vibrate });
   return vibrate;
 }
@@ -110,7 +113,7 @@ describe("order alarm", () => {
   it("gives the courier a 9-sweep siren built from a harsh sawtooth and square", () => {
     setup();
     playOrderAlarm({ loud: true });
-    const ctx = lastCtx!;
+    const ctx = lastCtx();
     // 9 cycles x 2 layers: the sawtooth wail plus a square layer on top of it.
     expect(ctx.oscillators).toHaveLength(18);
     expect(new Set(ctx.oscillators.map((o) => o.type))).toEqual(
@@ -128,7 +131,7 @@ describe("order alarm", () => {
   it("runs the courier siren near full volume through a limiter", () => {
     setup();
     playOrderAlarm({ loud: true });
-    const ctx = lastCtx!;
+    const ctx = lastCtx();
     expect(ctx.compressors).toHaveLength(1);
     expect(ctx.compressors[0]!.ratio.value).toBe(20);
     // First gain node is the master bus: loud, and far above the old 0.35 beep.
@@ -139,7 +142,7 @@ describe("order alarm", () => {
   it("keeps the shop-owner board a short 3-sweep chime", () => {
     setup();
     playOrderAlarm({});
-    const ctx = lastCtx!;
+    const ctx = lastCtx();
     expect(ctx.oscillators).toHaveLength(3);
     expect(ctx.gains[0]!.gain.value).toBe(0.55);
   });
@@ -164,14 +167,14 @@ describe("order alarm", () => {
     vi.advanceTimersByTime(200);
     expect(onEnd).toHaveBeenCalledTimes(1);
     expect(isAlarmRinging()).toBe(false);
-    expect(lastCtx!.closed).toBe(true);
+    expect(lastCtx().closed).toBe(true);
   });
 
   it("silences immediately when the courier stops it", () => {
     setup();
     const onEnd = vi.fn();
     const stop = playOrderAlarm({ loud: true, onEnd });
-    const ctx = lastCtx!;
+    const ctx = lastCtx();
     stop();
     expect(onEnd).toHaveBeenCalledTimes(1);
     expect(isAlarmRinging()).toBe(false);
@@ -184,18 +187,21 @@ describe("order alarm", () => {
   it("replaces a ringing alarm when a second order lands", () => {
     setup();
     playOrderAlarm({ loud: true });
-    const first = lastCtx!;
+    const first = lastCtx();
     playOrderAlarm({ loud: true });
     expect(first.closed).toBe(true);
     expect(isAlarmRinging()).toBe(true);
-    expect(lastCtx).not.toBe(first);
+    expect(lastCtx()).not.toBe(first);
+    expect(contexts).toHaveLength(2);
   });
 
   it("does nothing where the browser has no audio engine", () => {
+    contexts.length = 0;
     vi.stubGlobal("window", {});
     const onEnd = vi.fn();
     expect(playOrderAlarm({ loud: true, onEnd })).toBeTypeOf("function");
     expect(onEnd).toHaveBeenCalledTimes(1);
     expect(isAlarmRinging()).toBe(false);
+    expect(contexts).toHaveLength(0);
   });
 });
