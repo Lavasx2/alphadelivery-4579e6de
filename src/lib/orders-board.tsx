@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { formatPrice } from "@/lib/menu";
+import { playOrderAlarm, stopOrderAlarm } from "@/lib/order-alarm";
 import type { Database } from "@/integrations/supabase/types";
 
 type OrderLine = { name?: string; qty?: number; price?: number };
@@ -33,35 +34,6 @@ type Order = {
 
 const HIDE_DELIVERED_AFTER_MS = 4 * 60 * 1000;
 const REFRESH_MS = 12000;
-
-function beep() {
-  try {
-    const Ctx =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const play = (at: number, freq: number) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime + at);
-      gain.gain.exponentialRampToValueAtTime(0.35, ctx.currentTime + at + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + at + 0.3);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(ctx.currentTime + at);
-      osc.stop(ctx.currentTime + at + 0.35);
-    };
-    play(0, 880);
-    play(0.35, 1175);
-    play(0.7, 880);
-    setTimeout(() => void ctx.close(), 1500);
-  } catch {
-    /* audio unavailable */
-  }
-}
 
 export function OrdersBoard({ mode, storeId }: { mode: "owner" | "courier" | "store"; storeId?: string }) {
   const { t } = useI18n();
